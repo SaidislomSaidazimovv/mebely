@@ -161,9 +161,11 @@ function resolveAnchorDist(d: import("../contracts/design.js").AnchorRule, span:
 /**
  * DecorativeViyemka (DB/35 §5.4/§10.7): a user-drawn groove on a panel → a SawGrooveOp — the same op
  * shape as the back groove but `source:"user"` (the structural back groove stays profile-owned). This
- * is `modifiers[]`-decompose for the viyemka type. PROVISIONAL anchor reading — the measured point is
- * the founder's still-open ruling (#13 / R48): a groove parallel to the anchor edge, offset by its
- * distance, running `run` (or the full span). Emitted only for a panel that carries a viyemka modifier.
+ * is `modifiers[]`-decompose for the viyemka type. Anchor reading CONFIRMED by the founder
+ * (DB/45 §1, 2026-09-05): a groove parallel to the anchor edge, offset by its anchor distance,
+ * running `run` (or the full span). Emitted only for a panel that carries a viyemka modifier.
+ * (The 5 finer anchoring sub-cases — locked semantics, edge vs bbox, nominal vs finished, thickness
+ *  change, rule-tightening on a saved project — are DB/45 §1, tracked there.)
  */
 function viyemkaGrooves(node: DesignNode, part: Part): SawGrooveOp[] {
   const L = part.length_mm10, W = part.width_mm10;
@@ -177,7 +179,7 @@ function viyemkaGrooves(node: DesignNode, part: Part): SawGrooveOp[] {
       const x = a.edge === "left" ? resolveAnchorDist(a.distance, L) : L - resolveAnchorDist(a.distance, L);
       return { op: "saw_groove", id, face: "A", x_mm10: x, y_mm10: 0, endX_mm10: x, endY_mm10: run > 0 ? run : W, width_mm10, depth_mm10, source: "user" };
     }
-    // top/bottom (and, provisionally, front/back) → a groove parallel to the bottom/top edge
+    // top/bottom (front/back is a DB/45 §1 sub-case) → a groove parallel to the bottom/top edge
     const dist = a ? resolveAnchorDist(a.distance, W) : 0;
     const y = a && a.edge === "top" ? W - dist : dist;
     return { op: "saw_groove", id, face: "A", x_mm10: 0, y_mm10: y, endX_mm10: run > 0 ? run : L, endY_mm10: y, width_mm10, depth_mm10, source: "user" };
