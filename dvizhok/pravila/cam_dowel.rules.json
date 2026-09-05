@@ -1,0 +1,75 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Cam+dowel (eccentric cam / Minifix-Rastex-type) KD carcass joint — the F1 default per catalog/CORE_DOCTRINE.md function matrix (GTV = core default, Hettich Rastex 15 = upper substitute; same drilling envelope per R4 substitutability).",
+  "rule": "cam_dowel_size_by_panel_thickness",
+  "family": "cam_dowel_eccentric",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_page": 272,
+      "scope": "eccentric cams (WK-CAM series), transcribed by eye per catalog/packs/gtv_2025_06/connectors_pilot.json 'eccentric_cams_minifix'"
+    },
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_page": 273,
+      "scope": "eccentric bolts / dowel-bolt kits (WK-DOW63 series + WK-CAM-15-DOW63-KPL kits), same pilot transcription"
+    },
+    {
+      "document": "Hettich Connecting technology 2016 (16359 HUS).pdf",
+      "url": "https://web.hettich.com/fileadmin/media/Connecting_technology_2016_16359_HUS.pdf",
+      "printed_page": 8,
+      "retrieved_via": "WebFetch, 2026-08-03 — page number is the tool's read of the printed page number, not a manual page-render check; treat as provisional until spot-verified like the doc17 README requires for other Hettich entries.",
+      "scope": "Rastex 15/19 panel-thickness table: housing depth 24-34mm depending on panel thickness class (12/15/16/18/19/22/29mm), dowel diameter Ø8mm, dowel-length colour code (green=20mm for Rastex 15, black=30mm for Rastex 15, blue=24.5mm for Rastex 25)"
+    },
+    {
+      "document": "Hettich TA_2020_18565_en.pdf (Technik & Anwendung, 1390pp)",
+      "pdf_pages": [733, 734, 735, 736, 737, 738, 739, 740],
+      "scope": "Rastex 15 full technical section — pages known from catalog/packs/core_2026_06/accessories/het_rastex_15.json but NOT yet transcribed to numeric bands (grade: browse only). Re-derive exact per-thickness table from this document, not the shorter 2016 flyer, before promoting to verified:true."
+    }
+  ],
+  "verified": false,
+  "bands": [
+    {
+      "panel_thickness_mm": [16, 16],
+      "cam_diameter_mm": 15,
+      "cam_seat_depth_mm": 12.5,
+      "cam_height_candidates_mm": [12, 13],
+      "edge_dowel_diameter_mm": 8,
+      "edge_dowel_length_mm": 34,
+      "confidence": "high — matches 1169/1171 (99.8%) of every mined cam_dowel instance across 3 factory projects",
+      "sku_candidates": ["WK-CAM-15-12-D", "WK-CAM-15-13-D"],
+      "note": "GTV connectors_pilot.json flags this exact ambiguity unresolved: 'two cam heights exist [12,13mm] — CONFIRM which SKU ↔ which depth.' The mined dataset proves the SEAT depth (12.5mm) but cannot distinguish which of the two cam-height SKUs the factory actually buys, since cam height and seat depth are not 1:1 in the source PDF transcription."
+    },
+    {
+      "panel_thickness_mm": [16, 16],
+      "cam_diameter_mm": 15,
+      "cam_seat_depth_mm": 11,
+      "cam_height_candidates_mm": [10],
+      "edge_dowel_diameter_mm": 8,
+      "confidence": "low — 2/1171 (0.2%) of mined instances; could be measurement noise, an edge case, or a genuinely different SKU (WK-CAM-12-10, 12mm cam at 10mm height) mis-clustered by the 12.5mm-default extractor bucket.",
+      "sku_candidates": ["WK-CAM-12-10"]
+    }
+  ],
+  "bolt_dowel_length_note": {
+    "gtv_catalogued_lengths_mm": [31, 35, 39, 45],
+    "mined_length_mm": 34,
+    "verdict": "34mm does not exactly match any of the 4 GTV kit lengths (WK-DOW63X31/35/39/45) — closest is 35mm (WK-DOW63X35B-D), 1mm off. Flagged, not resolved: could be XML export rounding, a Hettich Rastex dowel substituted into a GTV cam housing (mixed-brand factory practice doc 16 already anticipates), or a distinct SKU not in the connectors_pilot.json pilot list. Needs a factory interview question (doc 16 §2 Source B) or direct SKU photo, not further inference."
+  },
+  "placement_principles_from_source": [
+    "Hettich 2016 flyer (p.8, printed): 'With torque support – allows furniture side panels to be pulled into place from space up to 4mm from the panel end' — describes cam pull-in tolerance, not a spacing/edge-distance rule.",
+    "No explicit minimum-edge-distance or pitch spec located yet in any source on hand for this family — unlike hinge_count.gtv.json's placement principles, this is a real gap. Cam pair spacing values in the mined dataset (64mm to 2313mm) are panel-geometry-driven outputs of the solver, not manufacturer minimums, and must not be read as a rule."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "cam_dowel",
+    "matches": 1171,
+    "depth_class_distribution": { "12.5mm": "1169/1171 (99.8%)", "11mm": "2/1171 (0.2%)" },
+    "verdict": "By far the highest-confidence family in the mined dataset (1171 of 1712 total decision rows, 68%). The 12.5mm seat depth for 16mm panel is essentially unanimous factory practice."
+  },
+  "engine_notes": "This is the F1_carcass_joint default (catalog/packs/core_2026_06/index.json → gtv_connectors_pilot). doc16 replay-metric target (≥95% agreement) is trivially achievable for THIS family alone given the 99.8% mined consistency — the open items are all at SKU-identification granularity (which exact cam-height and dowel-length SKU), not at the physics/placement level. Promote to verified:true only after resolving the two flagged SKU ambiguities against a factory interview or a spec-sheet photo, per doc 16 §2 Source B.",
+  "replay_evidence_R43": {
+    "source": "DB/37_JOINT_SELECTION_RULES.md §4 — held-out replay against the 7-panel real cabinet in `XML output examples`/`mined/` (panels not present in this file's training corpus, joint_decisions.dataset.json v0)",
+    "band1_confirmed": "18/18 face Ø15×12.5mm holes in the held-out cabinet matched band1 exactly (bottom×6, divider×4, plinth×4, sides×2+2).",
+    "band2_upgraded_not_noise": "band2 (Ø15×11mm, previously 2/1171 = 0.2% of the training corpus, flagged 'could be measurement noise') fired 4/4 times in the held-out cabinet — and all 4 came from the SAME panel role: POLKA-1_7_1, the shelf. Every one of the shelf's 4 cam holes used the 11mm depth; every non-shelf panel (bottom, divider, plinth, both sides) used 12.5mm exclusively. This is now 6 independent hits across ≥2 cabinets, not 2 in one — raise confidence from 'low, possible noise' to 'plausible role-conditioned rule: cam_seat_depth_mm depends on PartRole=shelf vs PartRole={bottom,divider,plinth,side}', still short of a citable manufacturer source and still verified:false, but no longer dismissable as an artifact.",
+    "conflict_with_dowel_rules": "The edge Ø8×34mm companion hole this family cites is byte-identical to dowel.rules.json's entire signature. In the held-out cabinet, all 18 edge Ø8×34mm instances were this family's cam companion (paired with a face Ø15 cam pocket on the mating panel) and 0 were a plain glued dowel joint. A resolver keying off diameter+depth alone cannot tell the two rules apart — see DB/37 §3 for the disambiguator (co-occurring face cam pocket on the mating panel) and the conflict-discipline this implies."
+  }
+}

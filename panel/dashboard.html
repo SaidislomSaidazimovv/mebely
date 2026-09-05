@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>MEBELCHI-NEXT · Панель</title>
+<style>
+  :root{
+    --bg:#0a1628; --ink:#dce8f5; --dim:#7d93ad; --line:#1d3a5f; --card:rgba(13,30,53,.92);
+    --green:#2ea86b; --yellow:#e3a72f; --red:#e35d5d; --violet:#9d7bf5; --blue:#4ea3f0; --lime:#57c765;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:-apple-system,'Segoe UI',sans-serif; padding:24px; min-height:100vh;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:46px 46px;}
+  h1{font-size:20px;} h1 span{font-size:12.5px; color:var(--dim); font-weight:400; margin-left:10px;}
+  .stamp{font-size:11.5px; color:var(--dim); margin-top:3px;}
+  .stamp b{color:var(--lime);}
+  .warn{margin:16px auto; max-width:700px; border:1px solid var(--yellow); border-radius:10px; padding:14px 18px; background:var(--card); font-size:13px; line-height:1.7;}
+  code{background:#16233b; padding:1px 7px; border-radius:5px; font-size:12px;}
+
+  .map{position:relative; width:1160px; height:440px; margin:16px auto 0;}
+  svg.roads{position:absolute; inset:0; width:100%; height:100%;}
+  .house{position:absolute; border:1.5px solid var(--line); border-radius:13px; background:var(--card); padding:11px 14px;}
+  .house.plan{border-style:dashed; opacity:.85;}
+  .house .top{display:flex; align-items:center; gap:8px;}
+  .led{width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px currentColor; flex-shrink:0;}
+  .house h2{font-size:14.5px; flex:1;} .house h2 small{color:var(--dim); font-weight:400; font-size:10.5px; margin-left:5px;}
+  .flag{font-size:9.5px; font-weight:700; padding:1.5px 7px; border-radius:99px; border:1px solid;}
+  .house p{font-size:11px; color:var(--dim); line-height:1.5; margin-top:6px;}
+  .house .live{font-size:11px; margin-top:6px; color:var(--dim);} .house .live b{color:var(--ink);}
+  .noroad{position:absolute; font-size:10.5px; color:var(--red); background:var(--bg); padding:1px 7px; border:1px dashed var(--red); border-radius:5px;}
+
+  .bays{width:1160px; margin:18px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .bay{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:14px 16px;}
+  .bay h3{font-size:13px; letter-spacing:1.5px; display:flex; align-items:baseline; gap:10px;}
+  .bay h3 span{font-size:11px; color:var(--dim); font-weight:400; margin-left:auto;}
+  .cas-row{display:grid; grid-template-columns:repeat(auto-fill,minmax(122px,1fr)); gap:9px; margin-top:11px;}
+  .cas{border:1px solid var(--line); border-radius:7px 7px 5px 5px; background:#101d33; text-align:center; padding-bottom:7px; transition:transform .13s;}
+  .cas:hover{transform:translateY(3px);}
+  .cas .ridges{height:9px; border-radius:7px 7px 0 0; background:repeating-linear-gradient(90deg,#25334d 0 5px,#16233b 5px 10px);}
+  .cas .lbl{margin:6px 6px 4px; background:#e9e6da; color:#23262b; border-radius:3px; font-size:11px; font-weight:700; padding:4px 2px; border-top:3px solid var(--blue);}
+  .cas .lbl small{display:block; font-weight:400; font-size:8.5px; color:#6b6e75;}
+  .cas .checks{font-size:8.5px; letter-spacing:1px; color:var(--dim); margin-top:4px;}
+  .cas .checks b{font-weight:700;}
+  .cas.template .lbl{background:none; border:1px dashed var(--line); border-top:3px solid var(--line); color:var(--dim);}
+  .legend{width:1160px; margin:12px auto 0; font-size:11px; color:var(--dim); display:flex; gap:18px; flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<h1>🏙 MEBELCHI-NEXT <span>ГОРОД снаружи · КАССЕТЫ внутри · панель обновляет только <b>node panel/scan.mjs</b></span></h1>
+<div class="stamp" id="stamp"></div>
+<div id="app"></div>
+
+<script id="status-data">
+/*STATUS-START*/
+window.MEBELCHI_STATUS = {"generated":"2026-09-04 00:14 UTC","api":"cartridge-api@1","houses":{"dogovor":{"files":26,"core":null},"dvizhok":{"files":93,"core":null},"prilozhenie":{"files":177,"core":142},"kuznitsa":{"files":74,"core":39},"biblioteka":{"files":0,"core":null},"dannye":{"files":4,"core":null},"panel":{"files":3,"core":null}},"bays":{"kuznitsa":{"list":[{"name":"_pustaya","titleRu":"Пустая кассета — скопируй меня","status":"template","m":true,"s":false,"t":false,"r":false,"apiOk":true,"source":null},{"name":"faska","titleRu":"Фаска","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"paz","titleRu":"Паз","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"povorot","titleRu":"Поворот","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"skleyka","titleRu":"Склейка","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"skruglenie","titleRu":"Скругление","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"vyemka","titleRu":"Выемка","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"},{"name":"vyrez","titleRu":"Вырез","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"forge-ui-handoff/src/component/modifiers.ts"}],"total":7,"green":7,"yellow":0,"red":0},"prilozhenie":{"list":[{"name":"hub","titleRu":"Хаб","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/Home+Projects+Settings+Auth"},{"name":"inzheneria","titleRu":"Инженерия","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/EngineeringScreen.tsx"},{"name":"konstruktor","titleRu":"Конструктор","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/ConfigScreen.tsx"},{"name":"peredacha","titleRu":"Передача","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/HandoffScreen.tsx"},{"name":"pomeshenie","titleRu":"Помещение","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/RoomScene.tsx"},{"name":"render","titleRu":"Рендер","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/RenderScreen.tsx"},{"name":"smeta","titleRu":"Смета","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/CostScreen.tsx"},{"name":"varianty","titleRu":"Варианты","status":"green","m":true,"s":true,"t":true,"r":true,"apiOk":true,"source":"Mebelchi 2/apps/app/screens/VariantsScreen.tsx"}],"total":8,"green":8,"yellow":0,"red":0}},"dannye":[{"file":"dannye\\katalogi\\furnitura.csv","vid":"tablica","status":"green","oshibki":[]},{"file":"dannye\\praysy\\tarify.csv","vid":"tablica","status":"green","oshibki":[]},{"file":"dogovor\\komplekty\\master.json","vid":"komplekt","status":"green","oshibki":[]},{"file":"dogovor\\komplekty\\probny.json","vid":"komplekt","status":"green","oshibki":[]},{"file":"dogovor\\komplekty\\raskroy.json","vid":"komplekt","status":"green","oshibki":[]},{"file":"dogovor\\komplekty\\sverlovka.json","vid":"komplekt","status":"green","oshibki":[]},{"file":"dogovor\\komplekty\\vizual.json","vid":"komplekt","status":"green","oshibki":[]},{"file":"dogovor\\nastroyki\\obshie.json","vid":"nastroyki","status":"green","oshibki":[]},{"file":"dogovor\\nastroyki\\tumblery.json","vid":"nastroyki","status":"green","oshibki":[]},{"file":"dogovor\\predlozheniya\\PR-1_tretya_mebel_za_nedelyu.json","vid":"predlozhenie","status":"green","oshibki":[]},{"file":"dogovor\\predlozheniya\\PR-2_pervyy_uspeshnyy_eksport.json","vid":"predlozhenie","status":"green","oshibki":[]},{"file":"dogovor\\predlozheniya\\PR-3_limit_palitry_dostignut.json","vid":"predlozhenie","status":"green","oshibki":[]},{"file":"dvizhok\\pravila\\cam_dowel.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\confirmat.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\dowel.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\min_size_gate.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\rafix_shelf_support.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\screw.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\shelf_pin.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"dvizhok\\pravila\\slide.rules.json","vid":"nastroyki","status":"gray","oshibki":[]},{"file":"kuznitsa\\nastroyki.json","vid":"nastroyki","status":"green","oshibki":[]},{"file":"prilozhenie\\nastroyki.json","vid":"nastroyki","status":"green","oshibki":[]}]};
+/*STATUS-END*/
+</script>
+<script>
+const S = window.MEBELCHI_STATUS;
+const app = document.getElementById("app");
+if (!S) {
+  app.innerHTML = `<div class="warn">⚠ <b>Нет данных.</b> Панель ничего не выдумывает — она читает <code>status.js</code>,
+   который создаёт сканер по реальным папкам.<br>Запусти в корне: <code>node panel/scan.mjs</code> и обнови страницу.</div>`;
+} else {
+  document.getElementById("stamp").innerHTML =
+    `скан: <b>${S.generated}</b> · розетка: <b>${S.api ?? "—"}</b> · данные вычислены из папок, не написаны руками`;
+
+  const C = { green:"var(--green)", yellow:"var(--yellow)", red:"var(--red)" };
+  const OWN = { f:["ОСНОВАТЕЛЬ","var(--violet)"], sd:["САИДИСЛОМ","var(--blue)"], s:["САИД","var(--lime)"] };
+
+  // ── дома: позиция + смысл; ЦВЕТ ЛАМПЫ решает сканер ──
+  const ledOf = (id) => {
+    const h = S.houses[id]; if (!h) return "red";
+    if (id === "dogovor")  return h.files >= 4 ? "green" : "yellow";
+    if (h.core !== null) { // prilozhenie / kuznitsa: ядро заехало? кассеты объявлены?
+      const bay = S.bays[id === "prilozhenie" ? "prilozhenie" : "kuznitsa"];
+      return h.core > 0 ? "green" : (bay.yellow + bay.green > 0 ? "yellow" : "red");
+    }
+    return h.files > 0 ? "green" : "red";
+  };
+  const liveOf = (id) => {
+    const h = S.houses[id];
+    if (id === "prilozhenie") { const b = S.bays.prilozhenie; return `экранов: <b>${b.total}</b> · заехало: <b>${b.green}</b> · объявлено: <b>${b.yellow}</b>`; }
+    if (id === "kuznitsa")    { const b = S.bays.kuznitsa;    return `слотов: <b>${b.total}</b> · готово: <b>${b.green}</b> · пусто: <b>${b.red}</b>`; }
+    return h.files > 0 ? `файлов: <b>${h.files}</b>` : `<b>пусто</b> — ждёт переезда`;
+  };
+  const H = [
+    { id:"kuznitsa",   n:"KUZNITSA",    ru:"кузница",    o:"sd", x:30,y:30,w:300,h:150, p:"Кассеты-инструменты. Верстак из mebelchi-3-build" },
+    { id:"dannye",     n:"DANNYE",      ru:"данные",     o:"f",  x:480,y:16,w:200,h:96,  p:"Каталоги · прайсы. Не код" },
+    { id:"prilozhenie",n:"PRILOZHENIE", ru:"приложение", o:"s",  x:830,y:30,w:300,h:150, p:"Кассеты-экраны 01–07 + хаб. Из Mebelchi 2" },
+    { id:"dogovor",    n:"DOGOVOR",     ru:"договор",    o:"f",  x:480,y:152,w:200,h:136,p:"Розетка города: интерфейс + схема + СТЕНД. Только PR" },
+    { id:"dvizhok",    n:"DVIZHOK",     ru:"движок",     o:"f",  x:30,y:240,w:300,h:150, p:"panelDecomposition · кромка · SWJ008/DXF. Из Mebelchi 2/engine" },
+    { id:"biblioteka", n:"BIBLIOTEKA",  ru:"библиотека", o:"f",  x:830,y:240,w:300,h:150,p:"komponenty (из Кузницы) · bloki (из Приложения)", plan:1 },
+    { id:"panel",      n:"PANEL",       ru:"панель",     o:"f",  x:480,y:330,w:200,h:96, p:"Этот экран + сканер" },
+  ];
+
+  const houses = H.map(h => `
+    <div class="house${h.plan?" plan":""}" style="left:${h.x}px;top:${h.y}px;width:${h.w}px;min-height:${h.h}px">
+      <div class="top"><div class="led" style="color:${C[ledOf(h.id)]};background:${C[ledOf(h.id)]}"></div>
+        <h2>${h.n}<small>${h.ru}</small></h2>
+        <span class="flag" style="color:${OWN[h.o][1]};border-color:${OWN[h.o][1]}">${OWN[h.o][0]}</span></div>
+      <p>${h.p}</p><div class="live">${liveOf(h.id)}</div>
+    </div>`).join("");
+
+  const cas = (c, color) => `
+    <div class="cas${c.status==="template"?" template":""}">
+      <div class="ridges"></div>
+      <div class="lbl" style="border-top-color:${c.status==="template"?"var(--line)":C[c.status]}">${c.titleRu}<small>${c.name}</small></div>
+      ${c.status==="template" ? `<div class="checks">копируй → строй</div>` : `
+      <div class="checks">
+        <b style="color:${c.m?"var(--green)":"var(--red)"}">М</b>·
+        <b style="color:${c.s?"var(--green)":"var(--red)"}">С</b>·
+        <b style="color:${c.t?"var(--green)":"var(--red)"}">Т</b>·
+        <b style="color:${c.r?"var(--green)":"var(--red)"}">Р</b></div>`}
+    </div>`;
+
+  const bay = (key, title, note) => {
+    const b = S.bays[key];
+    return `<div class="bay"><h3>${title}<span>${note} · 🟢${b.green} 🟡${b.yellow} 🔴${b.red}</span></h3>
+      <div class="cas-row">${b.list.map(c => cas(c)).join("")}</div></div>`;
+  };
+
+  app.innerHTML = `
+   <div class="map">
+    <svg class="roads">
+      <line x1="330" y1="105" x2="510" y2="200" stroke="#2ea86b" stroke-width="2"/>
+      <line x1="830" y1="105" x2="650" y2="200" stroke="#2ea86b" stroke-width="2"/>
+      <line x1="330" y1="315" x2="510" y2="250" stroke="#2ea86b" stroke-width="2"/>
+      <line x1="830" y1="315" x2="650" y2="250" stroke="#7d93ad" stroke-width="2" stroke-dasharray="6 5"/>
+      <line x1="580" y1="112" x2="580" y2="152" stroke="#7d93ad" stroke-width="2" stroke-dasharray="6 5"/>
+      <line x1="580" y1="288" x2="580" y2="330" stroke="#7d93ad" stroke-width="2" stroke-dasharray="6 5"/>
+      <line x1="335" y1="128" x2="825" y2="128" stroke="#e35d5d" stroke-width="1.5" stroke-dasharray="4 6"/>
+    </svg>
+    <div class="noroad" style="left:352px;top:135px">✕ прямой дороги нет — только через DOGOVOR</div>
+    ${houses}
+   </div>
+   <div class="bays">
+     ${bay("kuznitsa","🔨 KUZNITSA / cartridges","инструменты")}
+     ${bay("prilozhenie","🖥 PRILOZHENIE / cartridges","экраны маршрута")}
+   </div>
+   <div class="bay" style="width:1160px; margin:16px auto 0;">
+     <h3>📋 ФАЙЛЫ-НАСТРОЙКИ И ТАБЛИЦЫ<span>правишь файл → node panel/scan.mjs → лампа меняется · 🔴 = мерж закрыт</span></h3>
+     <table style="width:100%; margin-top:10px; border-collapse:collapse; font-size:11.5px;">
+      ${(S.dannye ?? []).map(d => {
+        const led = d.status === "green" ? "🟢" : d.status === "red" ? "🔴" : "⚪";
+        const note = d.status === "gray" ? "представлен · схемы ещё нет"
+                   : d.status === "green" ? "под контролем"
+                   : d.oshibki.join(" · ");
+        return `<tr style="border-top:1px solid var(--line)">
+          <td style="padding:5px 8px">${led}</td>
+          <td style="padding:5px 8px"><code style="background:#16233b;padding:1px 6px;border-radius:4px">${d.file}</code></td>
+          <td style="padding:5px 8px; color:var(--dim)">${d.vid === "tablica" ? "таблица (CSV — открывается Excel-ем)" : "настройки"}</td>
+          <td style="padding:5px 8px; color:${d.status === "red" ? "var(--red)" : "var(--dim)"}">${note}</td></tr>`;
+      }).join("")}
+     </table>
+   </div>
+   <div class="legend">
+     <span>🟢 готово / под контролем</span><span>🟡 объявлено</span><span>🔴 пустой слот / грязные данные</span><span>⚪ представлен, схемы нет</span>
+     <span><b>М·С·Т·Р</b> = manifest · src · test · реестр</span>
+     <span style="margin-left:auto">панель никто не редактирует руками — только node panel/scan.mjs</span>
+   </div>`;
+}
+</script>
+</body>
+</html>

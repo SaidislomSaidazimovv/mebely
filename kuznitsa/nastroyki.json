@@ -1,0 +1,8 @@
+{
+  "_": "НАСТРОЙКИ КУЗНИЦЫ — числа верстака живут здесь, не в коде. Магнит, сетка, углы.",
+  "magnit_mm": 5,
+  "setka_mm": 1,
+  "ugly_povorota": [90, 45],
+  "numpad_lyuboy_ugol": true,
+  "maks_modifikatorov_na_panel": 20
+}

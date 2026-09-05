@@ -1,0 +1,1 @@
+{ "id": "skruglenie", "titleRu": "Скругление", "api": "cartridge-api@1", "owner": "saidislom", "source": "forge-ui-handoff/src/component/modifiers.ts", "version": "0.1.0" }

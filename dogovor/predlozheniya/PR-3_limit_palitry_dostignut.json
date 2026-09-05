@@ -1,0 +1,37 @@
+{
+  "_": "ЧЕРНОВИК — пример формы. Лимит палитры — единственный лимит, который остаётся во всех комплектах кроме полных (DB/40: маленькая палитра — это фича). Предложение — в момент ПРИБЛИЖЕНИЯ, до того как лимит остановит работу (этика: объявлять заранее).",
+  "uid": "p-003",
+  "id": "PR-3",
+  "nazvanie": "Палитра почти полна → предложить комплект с палитрой побольше",
+  "status": "chernovik",
+  "trigger": {
+    "sobytie": "limit_palitry_dostignut",
+    "schyot": { "min": 1, "okno_dney": 30 },
+    "auditoriya": { "komplekty": ["probny", "raskroy"] }
+  },
+  "predlozhenie": {
+    "komplekt": "vizual",
+    "forma": "stroka_v_spiske",
+    "moment": "pri_priblizhenii_k_limitu",
+    "tekst": {
+      "ru": "В палитре 4 из 4. Больше материалов — в комплекте «Визуал» (до 8 в группе).",
+      "uz": "Palitrada 4 tadan 4 tasi. Ko'proq material — «Vizual» to'plamida (guruhda 8 tagacha)."
+    }
+  },
+  "psihologiya": {
+    "princip": "transparent limit + loss aversion avoided",
+    "pochemu": "Лимит назван до того, как он кого-то остановил. Мастер видит число, а не стену. Предложение — строка в списке, не модал: он продолжает работать.",
+    "istochnik": "Thaler & Sunstein (2008) Nudge — transparency principle · FTC 2022 «hidden costs at checkout» как анти-пример"
+  },
+  "ogranicheniya": {
+    "ne_chashe_dney": 30,
+    "maks_pokazov": 2,
+    "otkaz": "odin_tap",
+    "nikogda_pri": ["oshibka", "politsiya_BLOCK", "eksport_neudachen"]
+  },
+  "metrika": {
+    "uspekh": "komplekt_kuplen",
+    "okno_dney": 14,
+    "stop_esli_nizhe": 0.01
+  }
+}

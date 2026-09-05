@@ -1,0 +1,25 @@
+{
+  "_": "ЧЕРНОВИК — пример формы, составлен 2026-08-23 чтобы показать, как выглядит комплект. Содержание решает Пульт (DB/44 ruling 2), не разработчик. Разработчику запрещено ставить status=aktivno.",
+  "id": "probny",
+  "nazvanie": { "ru": "Пробный", "uz": "Sinov" },
+  "status": "chernovik",
+  "nasleduet": null,
+  "vklyucheno": {
+    "kassety": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+    "eksport": ["eman_xlsx"],
+    "kuznitsa": [],
+    "biblioteka": "lichnaya",
+    "render": "bystryy"
+  },
+  "limity": {
+    "mebel_v_nedelyu": 3,
+    "shkafov_v_proekte": 12,
+    "proektov": 5,
+    "materialov_v_palitre": 4
+  },
+  "politsiya": { "klassy": ["CE", "SENSE"], "otklyuchit": [] },
+  "profil": "QORASU_PROFILE",
+  "predlozheniya": ["PR-1", "PR-2", "PR-3"],
+  "cena": null,
+  "pochemu": "Мастер должен три раза убедиться, что раскрой доходит до Eman без правок, прежде чем его попросят платить. Три — это число, после которого инструмент уже «свой» (endowment)."
+}

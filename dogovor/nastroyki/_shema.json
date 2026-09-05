@@ -1,0 +1,15 @@
+{
+  "_": "КОНТРОЛЬ этой папки: что можно писать в каждый файл. Чужой ключ / не то значение = красный на панели, kontrol не пропустит.",
+  "obshie.json": {
+    "strogo": true,
+    "klyuchi": {
+      "tochnost_mm":          { "tip": "chislo", "min": 0.05, "max": 1 },
+      "edinicy":              { "tip": "vybor",  "varianty": ["mm"] },
+      "yazyki":               { "tip": "spisok", "varianty": ["ru", "uz"] },
+      "valyuta":              { "tip": "vybor",  "varianty": ["UZS", "USD"] },
+      "zazhim_pri_risovanii": { "tip": "vybor",  "varianty": ["predupredit", "zapretit", "molcha"] },
+      "zazhim_pri_eksporte":  { "tip": "vybor",  "varianty": ["zapretit"] }
+    }
+  },
+  "tumblery.json": { "strogo": false, "vse_znacheniya": "bul" }
+}

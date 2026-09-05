@@ -1,0 +1,24 @@
+{
+  "_": "СЛОВАРЬ СОБЫТИЙ — что приложения имеют право эмитить в журнал. Правило роста ссылается только на события отсюда; чужое событие = 🔴. Версия растёт при любом изменении (R51 решит про совместимость).",
+  "versiya": 1,
+  "sobytiya": {
+    "sessiya_nachata":            { "polya": ["komplekt"] },
+    "proekt_sozdan":              { "polya": ["proekt_id"] },
+    "proekt_otkryt":              { "polya": ["proekt_id"] },
+    "shkaf_dobavlen":             { "polya": ["proekt_id", "cabinetType"] },
+    "material_dobavlen":          { "polya": ["gruppa"] },
+    "limit_palitry_dostignut":    { "polya": ["gruppa", "limit"] },
+    "limit_mebeli_blizko":        { "polya": ["ispolzovano", "limit", "okno_dney"], "pochemu": "80% лимита — объявить заранее (этика)" },
+    "limit_mebeli_dostignut":     { "polya": ["limit", "okno_dney"] },
+    "render_zapushen":            { "polya": ["uroven"] },
+    "eksport_uspeshen":           { "polya": ["format", "proekt_id", "config_hash"], "pochemu": "успех = файл ушёл в бюро. Главное событие продукта" },
+    "eksport_neudachen":          { "polya": ["format", "prichina"] },
+    "politsiya_BLOCK":            { "polya": ["ruleId", "proekt_id"] },
+    "politsiya_WARN":             { "polya": ["ruleId", "proekt_id"] },
+    "oshibka":                    { "polya": ["kod"] },
+    "blok_opublikovan":           { "polya": ["blok_id"] },
+    "predlozhenie_pokazano":      { "polya": ["PR", "komplekt"] },
+    "predlozhenie_otkaz":         { "polya": ["PR"] },
+    "komplekt_kuplen":            { "polya": ["komplekt"] }
+  }
+}

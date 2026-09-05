@@ -1,0 +1,40 @@
+{
+  "_README": "Second cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Fixed/glued dowel joint (no eccentric cam — Ø8 dowel driven straight into a blind hole on both mating panels, glued, non-demountable). Companion to cam_dowel.rules.json, which covers the KD (knock-down) cam+dowel variant of the same nominal hardware.",
+  "rule": "dowel_size_glued_fixed",
+  "family": "dowel",
+  "source": {
+    "document": "GTV product listing — Wooden dowel (Kolek drewniany)",
+    "url": "https://gtv.com.pl/en/product-category/furniture-accessories/furniture-structural-elements/connection-elements/dowels-and-wedges/wooden-dowel/",
+    "sku": "KOL-DREW-KG15-8X35",
+    "scope": "single catalogued size only — Ø8 x 35mm wooden dowel, sold by 15kg bag",
+    "retrieved_via": "WebFetch (live site), 2026-08-03 — NOT a page-numbered PDF citation like hinge_count.gtv.json. The 788pp master GTV catalogue (Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf, source_documents.GTV in catalog/packs/core_2026_06/index.json) almost certainly carries the same SKU on a specific page, but the file is 184MB and exceeded the fetch tool's size ceiling (>20MB) — page number NOT yet confirmed. Re-derive by opening the PDF directly and citing pdf_page before verified:true."
+  },
+  "verified": false,
+  "bands": [
+    {
+      "panel_thickness_mm": [16, 18],
+      "dowel_diameter_mm": 8,
+      "dowel_length_mm": 34,
+      "note": "NOT a manufacturer-published band — this is the mined-dataset value (see mined_cross_check). GTV's only catalogued length is 35mm; no manufacturer document in hand gives a thickness-indexed selection table for plain glued dowels the way hinge_count.gtv.json's chart does for hinges."
+    }
+  ],
+  "placement_principles_from_source": [
+    "No placement/pitch/edge-distance guidance found in the GTV product listing or in doc 16/17 sources on hand — flagged as a gap, not inferred.",
+    "Academic cross-reference only (not yet fetched to page level, do not cite as verified): Eckelman et al., \"Optimum dowel spacing for corner joints in 32-mm cabinet construction\" — likely relevant to pitch/edge-distance for this exact family; fetch attempt hit a 429 rate limit. Follow up before promoting this rule."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "dowel",
+    "matches": 62,
+    "depth_class_distribution": { "34mm": "62/62 (100.0%)" },
+    "diameter_from_evidence_text": "Ø8×34mm edge pair, always paired with a face seat with no cam (\"Ø8×34 edge pair spacing Nmm ↔ face seats (no cam)\")",
+    "verdict": "Diameter (Ø8) and length (34mm, 1mm under GTV's catalogued 35mm — within tolerance/rounding) match the factory's actual practice for every one of 62 mined instances across all 3 projects. This is strong Source-A support for the SIZE, but there is still zero source for a thickness-based SELECTION rule (i.e. what changes at 18mm vs 25mm panels) — hence bands stays a single flat entry, not a table, and verified stays false."
+  },
+  "engine_notes": "Distinguish from cam_dowel.rules.json: this family is used where the joint never needs to be disassembled (glued fixed shelf, fixed carcass corner) — see doc 17 CORE_DOCTRINE.md F1/F2 'Ø8 glued dowel (fixed)' as-needed alternate to the cam+dowel KD default. Diameter/length band promoted from a website product listing, not a page-cited PDF — re-fetch the master GTV PDF in page-sized chunks (or request a shop export) to get a real pdf_page before promoting to verified:true, exactly as doc 17's own README requires for connectors_pilot.json entries.",
+  "known_conflict_with_cam_dowel": {
+    "problem": "This family's entire cited signature (edge Ø8×34mm) is identical to cam_dowel.rules.json's edge companion signature. Diameter+depth alone cannot distinguish 'this edge hole is a standalone glued dowel joint' from 'this edge hole is the bolt-dowel shank of a cam+bolt joint whose cam sits in the MATING panel's face.'",
+    "disambiguator": "Presence of a face Ø15×12.5mm (or ×11mm) cam pocket on the panel the edge hole's dowel/bolt would seat into. If found → cam_dowel (the edge hole is that family's companion, not this one). If genuinely absent on both plausible mating panels → this family (dowel).",
+    "replay_evidence_R43": "DB/37_JOINT_SELECTION_RULES.md §4 replayed a held-out 7-panel real cabinet: all 18 edge Ø8×34mm instances found were cam_dowel companions (a mating face cam pocket exists in every case); zero were resolved as a standalone glued dowel joint. This does not mean the dowel family is wrong or unused — CORE_DOCTRINE.md's own function matrix lists it as a real 'Also' alternate, and the 62 training-corpus instances are presumably genuine elsewhere — but it means this specific held-out cabinet is 100% KD (cam+dowel), consistent with catalog/CORE_DOCTRINE.md R11's 'carcass joints must be KD by default' and gives zero support for calling 'dowel' the default anywhere a resolver can't first check for a mating cam pocket.",
+    "resolution_rule_proposed": "A resolver must not emit either family from a single edge hole's diameter+depth in isolation. It must first attempt cam-pocket lookup on the joined panel; only mark the joint 'dowel' when that lookup is genuinely negative, and flag (never silently default) when the mating panel/joint cannot be resolved at all — per DB/20's flag discipline, extended in DB/37 §3."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "_": "КОНТРОЛЬ ПРАВИЛ РОСТА (DB/44 §3). Один файл = одно правило «триггер → предложение». Та же дисциплина, что у полиции: uid неизменный, id — человеческая метка, why и источник обязательны, метрика со стоп-условием обязательна. kontrol сверяет с этой схемой и с _etika.json.",
+  "*": {
+    "strogo": true,
+    "klyuchi": {
+      "uid":       { "tip": "tekst", "pochemu": "p-001… неизменный, бессмысленный, не переиспользуется (R46)" },
+      "id":        { "tip": "tekst", "pochemu": "PR-N — совпадает с началом имени файла" },
+      "nazvanie":  { "tip": "tekst" },
+      "status":    { "tip": "vybor", "varianty": ["chernovik", "aktivno", "ostanovleno", "arhiv"],
+                     "pochemu": "ostanovleno = метрика упала ниже стопа, правило само себя выключило" },
+      "trigger":   { "tip": "obekt", "klyuchi": {
+        "sobytie":    { "tip": "tekst", "pochemu": "из _slovar.json — чужое событие = 🔴" },
+        "schyot":     { "tip": "obekt", "klyuchi": {
+          "min":       { "tip": "chislo", "min": 1 },
+          "okno_dney": { "tip": "chislo", "min": 1, "max": 365 }
+        } },
+        "auditoriya": { "tip": "obekt", "klyuchi": {
+          "komplekty": { "tip": "spisok", "elementy": "tekst", "pochemu": "id комплектов из dogovor/komplekty/ — чужой = 🔴" }
+        } }
+      } },
+      "predlozhenie": { "tip": "obekt", "klyuchi": {
+        "komplekt": { "tip": "tekst", "pochemu": "что предлагаем — id комплекта" },
+        "forma":    { "tip": "vybor", "varianty": ["kartochka", "stroka_v_spiske", "soobshenie_telegram"],
+                      "pochemu": "модальные и блокирующие формы — запрещены _etika.json, их нет в списке намеренно" },
+        "moment":   { "tip": "vybor", "varianty": ["posle_uspeha", "pri_priblizhenii_k_limitu", "do_nachala_raboty_pri_limite", "v_nachale_sessii"],
+                      "pochemu": "во время экспорта / при ошибке / при открытии проекта — запрещены" },
+        "tekst":    { "tip": "obekt", "klyuchi": { "ru": { "tip": "tekst" }, "uz": { "tip": "tekst" } } }
+      } },
+      "psihologiya": { "tip": "obekt", "klyuchi": {
+        "princip":   { "tip": "tekst", "pochemu": "названный принцип: endowment · peak-end · loss aversion · reciprocity…" },
+        "pochemu":   { "tip": "tekst", "pochemu": "почему ИМЕННО здесь он сработает на мастере из Карасу" },
+        "istochnik": { "tip": "tekst", "pochemu": "первоисточник — без источника правило не принимается" }
+      } },
+      "ogranicheniya": { "tip": "obekt", "klyuchi": {
+        "ne_chashe_dney": { "tip": "chislo", "min": 1 },
+        "maks_pokazov":   { "tip": "chislo", "min": 1 },
+        "otkaz":          { "tip": "vybor", "varianty": ["odin_tap"] },
+        "nikogda_pri":    { "tip": "spisok", "elementy": "tekst", "pochemu": "обязан включать весь список _etika.nikogda_pri" }
+      } },
+      "metrika": { "tip": "obekt", "klyuchi": {
+        "uspekh":          { "tip": "tekst", "pochemu": "событие из _slovar.json, считающееся успехом" },
+        "okno_dney":       { "tip": "chislo", "min": 1 },
+        "stop_esli_nizhe": { "tip": "chislo", "min": 0, "max": 1, "pochemu": "конверсия ниже — правило ложное, как SENSE-1 до R47" }
+      } }
+    }
+  }
+}

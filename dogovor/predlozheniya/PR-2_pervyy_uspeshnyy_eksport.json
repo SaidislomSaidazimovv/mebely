@@ -1,0 +1,37 @@
+{
+  "_": "ЧЕРНОВИК — пример формы. Второй по силе триггер у профессиональных инструментов после порога использования — момент, когда результат уходит наружу (в бюро, клиенту).",
+  "uid": "p-002",
+  "id": "PR-2",
+  "nazvanie": "Первый успешный экспорт → показать, что даёт «Сверловка»",
+  "status": "chernovik",
+  "trigger": {
+    "sobytie": "eksport_uspeshen",
+    "schyot": { "min": 1, "okno_dney": 365 },
+    "auditoriya": { "komplekty": ["probny", "raskroy", "vizual"] }
+  },
+  "predlozhenie": {
+    "komplekt": "sverlovka",
+    "forma": "stroka_v_spiske",
+    "moment": "posle_uspeha",
+    "tekst": {
+      "ru": "Раскрой ушёл. Тот же проект может уйти и на присадку — файл GibLab за секунды вместо двух часов.",
+      "uz": "Raskroy ketdi. Shu loyiha parmalashga ham ketishi mumkin — GibLab fayli ikki soat o'rniga soniyalarda."
+    }
+  },
+  "psihologiya": {
+    "princip": "anchoring on saved time + foot-in-the-door",
+    "pochemu": "Мастер уже знает, что присадка — 1–2 часа очень опытного человека на заказ (Улугбек). Предложение называет именно эту цену времени, на том же проекте, который только что прошёл. Маленький сделанный шаг делает следующий естественным.",
+    "istochnik": "Freedman & Fraser (1966) foot-in-the-door · Tversky & Kahneman (1974) anchoring · заводские замеры DB/22"
+  },
+  "ogranicheniya": {
+    "ne_chashe_dney": 30,
+    "maks_pokazov": 2,
+    "otkaz": "odin_tap",
+    "nikogda_pri": ["oshibka", "politsiya_BLOCK", "eksport_neudachen"]
+  },
+  "metrika": {
+    "uspekh": "komplekt_kuplen",
+    "okno_dney": 14,
+    "stop_esli_nizhe": 0.01
+  }
+}

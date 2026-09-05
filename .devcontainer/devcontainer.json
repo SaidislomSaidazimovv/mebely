@@ -1,0 +1,5 @@
+{
+  "name": "mebelchi-next",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "postCreateCommand": "node panel/scan.mjs"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "render",
+  "titleRu": "Рендер",
+  "api": "cartridge-api@1",
+  "owner": "said",
+  "source": "Mebelchi 2/apps/app/screens/RenderScreen.tsx",
+  "version": "0.0.0"
+}

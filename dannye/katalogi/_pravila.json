@@ -1,0 +1,10 @@
+{
+  "furnitura.csv": {
+    "kolonki": {
+      "artikul":  { "tip": "tekst" },
+      "nazvanie": { "tip": "tekst" },
+      "tip":      { "tip": "vybor",  "varianty": ["petlya", "napravlyayushaya", "ruchka", "nozhka", "polkoderzhatel"] },
+      "cena_sum": { "tip": "chislo", "min": 0, "max": 10000000 }
+    }
+  }
+}

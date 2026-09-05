@@ -1,0 +1,8 @@
+{
+  "id": "varianty",
+  "titleRu": "Варианты",
+  "api": "cartridge-api@1",
+  "owner": "said",
+  "source": "Mebelchi 2/apps/app/screens/VariantsScreen.tsx",
+  "version": "0.0.0"
+}

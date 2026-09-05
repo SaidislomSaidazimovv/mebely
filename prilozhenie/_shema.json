@@ -1,0 +1,10 @@
+{
+  "nastroyki.json": {
+    "strogo": true,
+    "klyuchi": {
+      "marshrut":                { "tip": "spisok", "varianty": ["pomeshenie","varianty","konstruktor","render","inzheneria","smeta","peredacha","hub"] },
+      "smeta_mozhno_vyklyuchit": { "tip": "bul" },
+      "avtosohranenie_sek":      { "tip": "chislo", "min": 5, "max": 600 }
+    }
+  }
+}

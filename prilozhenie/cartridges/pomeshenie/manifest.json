@@ -1,0 +1,8 @@
+{
+  "id": "pomeshenie",
+  "titleRu": "Помещение",
+  "api": "cartridge-api@1",
+  "owner": "said",
+  "source": "Mebelchi 2/apps/app/screens/RoomScene.tsx",
+  "version": "0.0.0"
+}

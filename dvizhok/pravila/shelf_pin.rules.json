@@ -1,0 +1,56 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Adjustable shelf-support pin, System-32 pattern — the F3_shelf_adjustable default (gtv_shelf_pins) per catalog/CORE_DOCTRINE.md.",
+  "rule": "shelf_pin_size_and_spacing",
+  "family": "shelf_pin",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_pages": [246, 247],
+      "scope": "gtv_shelf_pins accessory (catalog/packs/core_2026_06/accessories/gtv_shelf_pins.json) — 'Shelf supports small (Ø5 pin class)'. Currently browse-grade only: pages known, no numeric drilling table transcribed yet — this rule table's diameter/depth numbers below come from the mined dataset and the System-32 standard cross-reference, NOT from a direct read of pages 246-247."
+    },
+    {
+      "document": "Hettich Furniture-Accessories TA_2020_18565_en.pdf",
+      "pdf_pages": [810, 811, 814, 815],
+      "scope": "het_shelf_supports accessory — same browse-grade caveat as above."
+    },
+    {
+      "document": "32 mm cabinetmaking system (Wikipedia, summarizing the DIN/industry System-32 standard)",
+      "url": "https://en.wikipedia.org/wiki/32_mm_cabinetmaking_system",
+      "retrieved_via": "WebFetch, 2026-08-03",
+      "scope": "normative pattern spec: 'columns of 5mm holes with centres at 32mm intervals'; hole depth 12-14mm; shelf-pin length 15-16mm; pin flange diameter ~7mm; first row 37mm from the front edge; rear row 37mm from the rear edge/inner face of the back panel; row spacing in multiples of 32mm. Encyclopedia summary, not a primary manufacturer document — cite the underlying DIN 68-something standard directly before promoting to verified:true."
+    },
+    {
+      "document": "Hettich Connecting technology 2016 (16359 HUS).pdf",
+      "url": "https://web.hettich.com/fileadmin/media/Connecting_technology_2016_16359_HUS.pdf",
+      "printed_page": 40,
+      "retrieved_via": "WebFetch, 2026-08-03 — provisional page number, not manually spot-checked",
+      "scope": "shelf-support load groups: 'Load group L 50 (50 kg/m²)' and 'Load group L 75 (75 kg/m²)', shown across Hettich's Safety / Sekura 1.1 / Sekura 2.1 / Sekura 6 / Universal D / Duplo / Push-in shelf-support lines. These are Hettich's OWN load classes, not GTV's — cross-brand load-rating equivalence for GTV's Ø5 pin is unconfirmed."
+    }
+  ],
+  "verified": false,
+  "bands": [
+    {
+      "pin_diameter_mm": 5,
+      "hole_depth_mm": 11,
+      "hole_pitch_mm": 32,
+      "confidence": "high on diameter+pitch, medium on depth — Ø5 and 32mm pitch match both the System-32 standard and the mined dataset; the 11mm depth is inside the standard's 12-14mm band but at its low edge (could be an 11mm-vs-12mm rounding/tolerance artifact in the mined XML, not a deliberate factory choice)."
+    }
+  ],
+  "load_rating_bands_UNVERIFIED": [
+    { "load_group": "L50", "rated_load_kg_per_m2": 50, "source": "Hettich only, not yet mapped to GTV's Ø5 pin class" },
+    { "load_group": "L75", "rated_load_kg_per_m2": 75, "source": "Hettich only, not yet mapped to GTV's Ø5 pin class" }
+  ],
+  "placement_principles_from_source": [
+    "System-32 standard: first hole row 37mm from the front edge; rear hole row 37mm from the rear edge / inner face of the back panel; row spacing in multiples of 32mm.",
+    "Mined evidence text confirms 'Ø5×11 column on face 5/6 (front/back rows)' — i.e. the factory drills front AND back rows, consistent with the standard's two-row pattern, but the extractor has not yet recorded the 37mm edge offset as a measured value (only the column existence and pitch)."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "shelf_pin",
+    "matches": 12,
+    "depth_class_distribution": { "11mm": "12/12 (100.0%)" },
+    "verdict": "Small sample (12 rows, all from the same evidence pattern 'Ø5×11 column ... front/back rows') but internally 100% consistent. Weakest-evidence family after screw and rafix_20 by row count, but unlike screw it has at least a real cross-referenced normative standard (System-32) plus factory hits."
+  },
+  "engine_notes": "Diameter and pitch are solid (System-32 + mined agreement). Depth (11 vs standard 12-14mm) and load rating are both open: (1) re-render GTV pp.246-247 and Hettich pp.810-811/814-815 to get manufacturer-stated depth and load-per-pin numbers rather than relying on a third-party encyclopedia summary and a different brand's load classes; (2) the L50/L75 load bands are left in a clearly separate 'UNVERIFIED' key rather than merged into bands, specifically so the engine cannot accidentally treat a Hettich load class as validated for the GTV default SKU.",
+  "replay_evidence_R43": "DB/37_JOINT_SELECTION_RULES.md §4 replayed a held-out real cabinet: 8 new face Ø5×11mm instances (divider×4, both sides×2 each), all depth-11mm, 8/8 consistent with the existing band. Role pattern observed: the divider (an interior panel between two shelves) carries pin columns on BOTH its faces (face 5 and face 6 in the machine frame — see DB/37 §1 on why 'face N' is not yet a portable orientation signal), while each side panel carries pins on one face only. Consistent with the System-32 two-row front/back pattern already noted, adds no new depth or load evidence."
+}

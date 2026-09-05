@@ -1,0 +1,9 @@
+{
+  "_": "ОБЩИЕ НАСТРОЙКИ ГОРОДА — одна правда для всех домов. Правишь здесь → все видят. Контроль: _shema.json рядом.",
+  "tochnost_mm": 0.25,
+  "edinicy": "mm",
+  "yazyki": ["ru", "uz"],
+  "valyuta": "UZS",
+  "zazhim_pri_risovanii": "predupredit",
+  "zazhim_pri_eksporte": "zapretit"
+}

@@ -1,0 +1,25 @@
+{
+  "_": "ЧЕРНОВИК — пример формы (DB/44). Работа Улугбека №1: раскрой → Excel → Eman. Сейчас это 1–2 часа опытного мастера; комплект продаёт именно эти часы.",
+  "id": "raskroy",
+  "nazvanie": { "ru": "Раскрой", "uz": "Raskroy" },
+  "status": "chernovik",
+  "nasleduet": "probny",
+  "vklyucheno": {
+    "kassety": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+    "eksport": ["eman_xlsx"],
+    "kuznitsa": [],
+    "biblioteka": "obshaya",
+    "render": "bystryy"
+  },
+  "limity": {
+    "mebel_v_nedelyu": null,
+    "shkafov_v_proekte": null,
+    "proektov": null,
+    "materialov_v_palitre": 6
+  },
+  "politsiya": { "klassy": ["CE", "SENSE", "GEO"], "otklyuchit": [] },
+  "profil": "QORASU_PROFILE",
+  "predlozheniya": ["PR-2", "PR-3"],
+  "cena": null,
+  "pochemu": "Безлимитный раскрой — базовая рабочая лицензия. Лимит остаётся только на палитру: 6 материалов хватает любой кухне, а выпадающий список из 1000 — не список (DB/40)."
+}

@@ -1,0 +1,12 @@
+{
+  "nastroyki.json": {
+    "strogo": true,
+    "klyuchi": {
+      "magnit_mm":                   { "tip": "chislo", "min": 0, "max": 50 },
+      "setka_mm":                    { "tip": "chislo", "min": 0.25, "max": 100 },
+      "ugly_povorota":               { "tip": "spisok", "varianty": [15, 30, 45, 90] },
+      "numpad_lyuboy_ugol":          { "tip": "bul" },
+      "maks_modifikatorov_na_panel": { "tip": "chislo", "min": 1, "max": 100 }
+    }
+  }
+}

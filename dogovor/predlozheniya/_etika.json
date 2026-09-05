@@ -1,0 +1,20 @@
+{
+  "_": "ЭТИКА — ЗАПЕЧАТАНО. Ядро правил роста. Литература, объясняющая, почему подталкивание работает, объясняет и почему тёмные паттерны удаляют приложение и штрафуют. kontrol сверяет каждое правило с этим файлом: нарушение = 🔴, мерж закрыт.",
+  "nikogda_pri": ["oshibka", "politsiya_BLOCK", "eksport_neudachen"],
+  "otkaz": "odin_tap",
+  "min_ne_chashe_dney": 7,
+  "maks_pokazov_na_pravilo": 3,
+  "maks_v_nedelyu_vsego": 1,
+  "zapreshennye_formy": ["modal_blokiruyushiy", "obratnyy_otschyot", "lozhnyy_deficit", "polnoekrannyy"],
+  "zapreshennye_momenty": ["vo_vremya_eksporta", "pri_oshibke", "pri_otkrytii_proekta", "pri_politsii_BLOCK"],
+  "limit_obyavlyat_zaranee": true,
+  "oplachennoe_ne_zakryvat": true,
+  "pravila_slovami": [
+    "Никогда не продавать в момент неудачи — пользователь читает это как вымогательство.",
+    "Отказ — один тап, такой же заметный, как согласие, и запоминается.",
+    "Никакого ложного дефицита, никаких таймеров, которые не настоящие, никаких скрытых лимитов, всплывающих при экспорте.",
+    "Лимит, который остановит работу, объявляется ДО начала работы, никогда после.",
+    "То, за что уже заплачено, никогда не закрывается ни одним правилом."
+  ],
+  "istochnik": "EU DSA 2022 ст. 25 (тёмные паттерны) · FTC «Bringing Dark Patterns to Light» 2022 · Brignull, deceptive.design · DB/44 §3.1"
+}

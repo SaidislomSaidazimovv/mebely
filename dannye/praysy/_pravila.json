@@ -1,0 +1,10 @@
+{
+  "_": "КОНТРОЛЬ ТАБЛИЦ этой папки. Колонки закрыты списком — чужая колонка не пролезет. Excel-файлы от завода кидай в dannye/vhodyashie/, канон — только эти CSV.",
+  "tarify.csv": {
+    "kolonki": {
+      "operaciya": { "tip": "vybor",  "varianty": ["raspil", "kromka", "sverlovka", "chpu"] },
+      "edinica":   { "tip": "vybor",  "varianty": ["m", "m2", "otverstie", "min"] },
+      "cena_sum":  { "tip": "chislo", "min": 0, "max": 10000000 }
+    }
+  }
+}

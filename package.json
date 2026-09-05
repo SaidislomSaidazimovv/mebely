@@ -1,0 +1,35 @@
+{
+  "name": "mebelchi-next",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "scan": "node panel/scan.mjs",
+    "proverka": "node dogovor/proverka.mjs",
+    "kontrol": "node dogovor/kontrol.mjs",
+    "pult": "node pult/scan.mjs",
+    "inventar": "node pult/proverka-inventar.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/share": "^7.0.4",
+    "@supabase/supabase-js": "^2.112.4",
+    "expr-eval": "^2.0.2",
+    "fflate": "^0.8.2",
+    "jspdf": "^2.5.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.171.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.171.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.11"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "_": "ЧЕРНОВИК — пример формы (DB/44). Работа Улугбека №2: присадка → GibLab. Сейчас 1–2 часа ОЧЕНЬ опытного мастера на заказ. В ближайшей версии — только евровинт (конфирмат), без эксцентриков.",
+  "id": "sverlovka",
+  "nazvanie": { "ru": "Сверловка", "uz": "Parmalash" },
+  "status": "chernovik",
+  "nasleduet": "raskroy",
+  "vklyucheno": {
+    "kassety": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+    "eksport": ["eman_xlsx", "giblab_project", "swj008"],
+    "kuznitsa": [],
+    "biblioteka": "obshaya",
+    "render": "bystryy"
+  },
+  "limity": {
+    "mebel_v_nedelyu": null,
+    "shkafov_v_proekte": null,
+    "proektov": null,
+    "materialov_v_palitre": 8
+  },
+  "politsiya": { "klassy": ["CE", "SENSE", "GEO", "CONS"], "otklyuchit": [] },
+  "profil": "QORASU_PROFILE",
+  "predlozheniya": [],
+  "cena": null,
+  "pochemu": "Файл сверловки уходит на ЧПУ — поэтому здесь ВКЛЮЧЕНО больше полиции, а не меньше: CONS (целостность) и GEO обязательны, когда ошибка стоит панелей клиента."
+}

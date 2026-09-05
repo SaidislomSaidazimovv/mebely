@@ -1,0 +1,51 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Rafix-type eccentric shelf connector — the heavy/secured F3_shelf_adjustable alternate per catalog/CORE_DOCTRINE.md ('rafix-type eccentric (MM-FI20) for heavy/secured'). Cross-brand equivalent group: GTV's MM-FI20 and Hettich's VB 35/36 share the same function_group and, per the sources below, essentially the same housing diameter — the doc17 R4 substitutability claim is directly supported here, not just asserted.",
+  "rule": "rafix_shelf_connector_size",
+  "family": "shelf_connector_eccentric",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_page": 271,
+      "scope": "'shelf_eccentric_rafix_type' entry in catalog/packs/gtv_2025_06/connectors_pilot.json — MM-FI20 SKU family (MM-FI20-20X6X11-PL10/20/30/80-1T, -ZN-1T), housing Ø20mm (from SKU), dowel Ø6×16.5mm, seat depths seen in drawing: 11.5/12.5/13.5mm (already flagged in-source as needing visual re-confirmation, drawing dims interleaved with text)."
+    },
+    {
+      "document": "Hettich Connecting technology 2016 (16359 HUS).pdf",
+      "url": "https://web.hettich.com/fileadmin/media/Connecting_technology_2016_16359_HUS.pdf",
+      "printed_pages": [14, 15, 16, 17, 18],
+      "retrieved_via": "WebFetch, 2026-08-03 — provisional page numbers",
+      "scope": "VB 35/36 connecting fittings: housing Ø20mm, depth ~9.5mm, screw-in dowel Ø5mm (this document's own figure; note it differs from GTV's Ø6mm dowel — see gap below); VB35 M/19 dowel centre 14mm from the shelf underside on a 19mm shelf; VB36 M is 'pressed into a double hole drilled 32mm apart, insertion holes in a diameter of 20 and 10mm'."
+    },
+    {
+      "document": "Hettich TA_2020_18565_en.pdf",
+      "pdf_pages": [745, 748, 749, 750, 751],
+      "scope": "het_vb35 accessory (catalog/packs/core_2026_06/accessories/het_vb35.json) — full technical section, browse-grade only, pages known but not transcribed to numbers here."
+    }
+  ],
+  "verified": false,
+  "bands": [
+    {
+      "shelf_thickness_mm": [16, 19],
+      "housing_diameter_mm": 20,
+      "housing_depth_mm_seen_in_drawing": [11.5, 12.5, 13.5],
+      "dowel_diameter_mm": "6 (GTV) vs 5 (Hettich 2016 flyer) — UNRESOLVED conflict, see gap_flag",
+      "dowel_length_mm": 16.5,
+      "hole_pitch_mm_hettich": 32,
+      "confidence": "housing diameter (Ø20) independently confirmed by both brands and by 2/2 mined rafix_20 instances — the strongest cross-brand agreement of any figure in this file. Every other number here is single-source or conflicting."
+    }
+  ],
+  "gap_flag": "Dowel diameter conflict: GTV's connectors_pilot.json states the rafix dowel is Ø6mm; the Hettich 2016 flyer states VB35/36's screw-in dowel is Ø5mm. These may legitimately be different-diameter dowels for the same Ø20 housing across brands (plausible, since R4 only requires the DRILLED housing to be substitution-compatible, not every internal dowel), or one of the two transcriptions is wrong. Do not merge into a single verified number without checking a rendered page of each source side by side.",
+  "placement_principles_from_source": [
+    "Hettich VB 36 M: 'pressed into a double hole drilled 32mm apart, insertion holes in a diameter of 20 and 10mm' — i.e. TWO different-diameter holes per fitting (Ø20 housing + Ø10 secondary), 32mm apart. GTV's MM-FI20 SKU naming (20X6X11) does not obviously encode a second hole diameter — worth checking whether GTV's version is single-hole or also double-hole; not resolved here.",
+    "No minimum shelf-edge distance or load-per-fitting figure located in either source on hand."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "rafix_20",
+    "matches": 2,
+    "depth_class_distribution": { "17mm": "2/2 (100.0%)" },
+    "evidence_text": "'Ø20 face seat (first sighting — none seen before)' — the extractor's own language flags this as a novel, low-confidence detection, not an established pattern.",
+    "verdict": "Weakest mined evidence of all seven families by row count (2 rows total, both from the same project). The 17mm depth class does not match either brand's housing-depth figures above (GTV 11.5-13.5mm, Hettich ~9.5mm) — another unresolved gap, possibly because a 17mm-deep Ø20 bore is a DIFFERENT feature (e.g. a lift or hinge seat, cf. hinge_cup's own Ø35 face bore at 13mm depth, or gtv_hinge_glass's Ø20-class hardware) that the extractor is currently mis-bucketing into 'rafix_20' rather than a real rafix sighting."
+  },
+  "engine_notes": "This is the family with the most open questions of the seven researched here: a cross-brand dowel-diameter conflict, a depth mismatch between the mined data and both catalogued sources, and only 2 mined rows to cross-check against — well below doc 16's ≥95%-agreement replay bar and too thin to draw any conclusion from. Before any use in the solver: (1) render GTV p.271 and Hettich pp.745/748-751 directly rather than relying on the pilot transcription and a 2016 flyer; (2) ask the constructor (doc 16 §2 Source B) whether the 2 mined Ø20×17mm sightings are actually rafix fittings or something else, since the extractor itself flagged them as novel/unconfident.",
+  "replay_evidence_R43": "DB/37_JOINT_SELECTION_RULES.md §4 replayed a held-out real cabinet (a shelf_unit with no rafix-class hardware expected) and found ZERO Ø20-class holes — consistent with absence, but this is not a positive test of the family; it still has only the original 2 corpus rows behind it. Still the weakest-evidence family; needs a held-out cabinet that actually uses rafix/VB-type shelf connectors before this rule can be exercised at all."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "hub",
+  "titleRu": "Хаб",
+  "api": "cartridge-api@1",
+  "owner": "said",
+  "source": "Mebelchi 2/apps/app/screens/Home+Projects+Settings+Auth",
+  "version": "0.0.0"
+}

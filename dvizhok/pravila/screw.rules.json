@@ -1,0 +1,34 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Generic wood/chipboard/Euro screw — the catch-all fastener used for shelf-support-screw mounting, back-panel screws, hinge/plate mounting, cabinet hanger fixing, and F13 worktop banking, per catalog/CORE_DOCTRINE.md. This is the WEAKEST-EVIDENCE family of the seven: no page-numbered manufacturer selection table and zero hits in the mined factory dataset.",
+  "rule": "screw_size_by_application",
+  "family": "screw",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_page": 272,
+      "scope": "'wood_screws' entry in catalog/packs/gtv_2025_06/connectors_pilot.json — SKUs WK-D0320-001*, WK-D0325-001*, WK-D0330-001* (3x20/25/30mm), WK-D0416-001*, WK-D0425-001* (4x16/25mm). Catalogue footnote marks ALL of these '* = special-order' — i.e. not standard stock, contradicting CORE_DOCTRINE.md R10 (stock depth) for this exact SKU family."
+    },
+    {
+      "document": "GTV product listing — Chipboard screw",
+      "url": "https://gtv.com.pl/en/product-category/furniture-accessories/furniture-structural-elements/connection-elements-2/screws-and-confirmat-screws/chipboard-screw/",
+      "scope": "separate, larger SKU range actually shown as orderable on the live site: WK-IF-PW3515/3520/3535/3540/3550 (3.5mm dia, 15-50mm), WK-IF-PW4018/4040/4050/4060 (4mm dia, 18-60mm), WK-IF-PW4530 (4.5x30mm), WK-IF-PW5050 (5x50mm), WK-IF-PW6080 (6x80mm), all PZ2/PZ3 drive.",
+      "retrieved_via": "WebFetch (live site), 2026-08-03 — not a page-numbered PDF citation; the master PDF page for this SKU range has not been located."
+    }
+  ],
+  "verified": false,
+  "bands": [],
+  "gap_flag": "NO SELECTION BANDS PRODUCED. Two disjoint, non-overlapping SKU lists exist in the sources on hand (3-4mm special-order set at pdf_page 272 vs. the 3.5-6mm live-stock chipboard-screw range) with no manufacturer document that maps screw size to panel thickness or application (hinge plate vs. back-panel vs. hanger vs. worktop). Per the task instruction, an uncited number is marked, not guessed — this file intentionally ships with an empty bands array rather than a fabricated table.",
+  "placement_principles_from_source": [],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "screw",
+    "matches": 0,
+    "verdict": "The mined extractor (doc 16 §2 Source A) does not currently tag a distinct 'screw' family at all — nine families are recognized (cam_dowel 1171, confirmat 209, hinge_cup 94, groove_joint 69, marking 62, dowel 62, slide_row 31, shelf_pin 12, rafix_20 2) and none is 'screw'. joint_decisions.unmatched.txt's largest unmatched classes ('bolt_seat' Ø8x11mm x224, Ø8x14mm x152; 'other' Ø4.5x17mm x24, Ø7x10mm x16, etc.) are plausible screw-pilot candidates but are explicitly unclassified ('other'/'bolt_seat', not 'screw') by the extractor as it stands — attributing them to plain wood screws here would be a guess, not a citation."
+  },
+  "engine_notes": "This family needs Source A extractor work before it needs more manufacturer research: teach the joint extractor (doc 16 §6 step 1) to recognize a 'screw' hole class (small diameter, no companion cam/confirmat/dowel bore, often near a hinge plate, hanger bracket, or panel edge) so the 224+152+other unmatched holes above can be triaged. Until then this rule table cannot be honestly populated and should block on doc 16 §2 Source B (ask the constructor directly which screw he reaches for and why) rather than Source D (AI proposal), since Source D's own hard rule requires 'a passing test against the mined dataset' that literally cannot run while the family is untagged.",
+  "replay_evidence_R43": {
+    "note": "DB/37_JOINT_SELECTION_RULES.md §4/§6 replayed a held-out real cabinet outside the training corpus and hit the SAME unresolved 'bolt_seat'-class holes again, at a materially higher rate than any cited family here: face Ø8×11mm ×20 (bottom, worktop, both sides) and face Ø8×14mm ×14 (a second held-out unit's panels) — together the single largest unresolved class in the replay, 40%+ of the held-out cabinet's holes once slide-signature and dowel/cam_dowel ambiguity are set aside.",
+    "candidates_not_confirmed": "Worktop-to-carcass fixing bolt (F13, CORE_DOCTRINE.md — 8/20 of the held-out Ø8×11 hits are on KRISHKA_1_1, the worktop panel, in a rectangular pattern consistent with banking/fixing points, not a hinge or shelf-pin pattern); a confirmat-family pilot variant at a shallower depth than the 17mm band; or a plain wood/chipboard screw pilot per this file's SKU lists. None of these is confirmed — still exactly the gap this file already declared, now with more instances behind it and a stronger case that it is THE single highest-priority Source B question for R43's follow-up.",
+    "still_zero_bands": "bands stays [] — more unmatched instances is not a citation."
+  }
+}

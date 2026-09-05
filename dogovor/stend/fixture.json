@@ -1,0 +1,11 @@
+{
+  "_": "СТЕНД — общая тестовая кухня. НЕ простая коробка: Г-форма + угловой модуль + гола. Каждая кассета обязана дать на нём правильный JSON (test/golden).",
+  "name": "L-kuhnya-gola",
+  "profileId": "std-16mm",
+  "panels": [
+    { "id": "bok-A",   "role": "side",  "envelope_mm": { "width_mm": 560, "height_mm": 720, "depth_mm": 16 } },
+    { "id": "fasad-B", "role": "front", "envelope_mm": { "width_mm": 396, "height_mm": 716, "depth_mm": 16 }, "gola_top_mm": 58 },
+    { "id": "ugol-C",  "role": "corner","envelope_mm": { "width_mm": 900, "height_mm": 720, "depth_mm": 16 }, "note": "угловой — ловит абсолютные координаты" }
+  ],
+  "TODO": "заполнить реальными данными из Mebelchi 2 при переезде dvizhok"
+}

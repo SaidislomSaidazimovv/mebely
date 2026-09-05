@@ -1,0 +1,51 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Drawer slide/runner mounting-hole pattern (F7_drawer_runner). Distinct from a slide LENGTH-selection table — the catalogue sources on hand give standard length ranges per product line but no manufacturer document with a cabinet-depth-to-length formula; that formula is flagged as ungrounded, not fabricated.",
+  "rule": "slide_mounting_pattern_and_length_range",
+  "family": "slide",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_pages": [146, 147, 148],
+      "scope": "gtv_bb_slide_h45 (VERSALITE H45 ball-bearing slide) — 'lengths 250-550'. SKUs on file: PK-L-H45-250-B, PK-L-H45-300-GX, PK-0-H45-250. Browse-grade; full length ladder (all increments between 250 and 550) not yet transcribed."
+    },
+    { "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf", "pdf_pages": [152, 153], "scope": "gtv_bb_slide_softclose (H45 HK soft-close variant)" },
+    { "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf", "pdf_pages": [160, 161], "scope": "gtv_roller_slide (budget roller runner)" },
+    { "document": "Hettich TA_2020_18565_en.pdf", "pdf_pages": [1086, 1087, 1090], "scope": "het_ka270 (KA 270 roller runner)" },
+    { "document": "Hettich TA_2020_18565_en.pdf", "pdf_pages": [365, 366, 367, 368], "scope": "het_quadro_v6 (Quadro V6 full-extension concealed runner)" },
+    { "document": "Hettich TA_2020_18565_en.pdf", "pdf_pages": [340, 342, 344], "scope": "het_actro_5d (Actro 5D premium runner)" },
+    { "document": "Blum Catalogue and technical manual 2024-2025 en.pdf", "pdf_pages": [416, 418], "scope": "blum_movento_760h — SKU 760H4500 on file (SKU's own '4500' suffix implies a 450mm nominal length under Blum's naming convention, not independently confirmed against the PDF page render)" },
+    { "document": "Blum Catalogue and technical manual 2024-2025 en.pdf", "pdf_pages": [438, 440], "scope": "blum_tandem_550h — SKUs 550H4500, T51.1700 on file (same '4500'-suffix inference as above)" }
+  ],
+  "verified": false,
+  "bands": [
+    {
+      "product_line": "GTV VERSALITE H45 (ball-bearing, F7 default)",
+      "length_range_mm": [250, 550],
+      "mounting_hole_diameter_mm": 4.5,
+      "mounting_hole_depth_mm": 10,
+      "mounting_pitch_mm": 32,
+      "confidence": "length range from GTV catalogue page 146-148 (accessory name only, not a rendered table — treat range endpoints as approximate); mounting hole spec (Ø4.5×10mm @ 32mm pitch) confirmed independently by mined dataset, 31/31 (100%) of tagged slide_row instances."
+    }
+  ],
+  "length_selection_formula_UNGROUNDED": {
+    "commonly_used_industry_rule": "slide length = usable cabinet/carcass depth, rounded DOWN to the nearest standard catalogue length",
+    "status": "This is a well-known trade convention (seen across multiple woodworking-forum and slide-calculator sources during research) but NO manufacturer document in hand — GTV, Hettich, or Blum — states it as an explicit formula on a specific page. It is NOT included in bands above and must not be treated as cited. Do not implement in the solver as if it were a manufacturer rule; if used, log it explicitly as an engineering assumption pending citation."
+  },
+  "placement_principles_from_source": [
+    "Mined evidence text: 'Ø4.5×10 row at 32mm pitch on face N' for faces 1-4 — i.e. the same System-32-pitch mounting row is drilled on both drawer-box sides and both cabinet-side faces, consistent with a standard side-mount ball-bearing runner."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "slide_row",
+    "matches": 31,
+    "depth_class_distribution": { "10mm": "31/31 (100.0%)" },
+    "face_distribution": { "face_2": 19, "face_4": 4, "face_3": 4, "face_1": 4 },
+    "verdict": "Mounting-hole geometry (Ø4.5×10mm, 32mm pitch) is fully consistent across every mined instance and matches the System-32 pitch already cross-referenced in shelf_pin.rules.json. This is strong evidence for the DRILLING pattern; it says nothing about which LENGTH the factory picks for a given cabinet depth, since mined positions_mm10 record hole coordinates, not the SKU/length chosen — that would require joining against the mined mined_panels.csv depth field per project, not yet done here."
+  },
+  "engine_notes": "Two separable questions got conflated in the family name 'slide': (1) the mounting-hole drilling pattern — well evidenced, Ø4.5×10 @ 32mm pitch, cited above; (2) length selection by cabinet depth — NOT evidenced by any manufacturer document on hand, flagged separately and excluded from bands. Before promoting either half to verified:true: for (1), render GTV pp.146-148 directly to confirm the pitch table printed there matches the mined 32mm; for (2), either find the manufacturer's own depth-to-length guidance (GTV/Hettich/Blum technical manuals typically publish one) or run mined_panels.csv against the mined slide_row rows per-project to derive the factory's actual observed depth→length mapping as a Source-A rule instead of an industry rule-of-thumb.",
+  "context_gate_required_replay_evidence_R43": {
+    "problem": "DB/37_JOINT_SELECTION_RULES.md §4 replayed a held-out real cabinet with ZERO drawers (a shelf_unit: 2 sides, bottom, divider, shelf, plinth, worktop). The exact Ø4.5×10mm @ 32mm-pitch edge signature this rule cites fired 12 times anyway — 4× on the plinth (OYOQ_8_1) and 4× on each side panel — in a cabinet that cannot contain a drawer slide. These are almost certainly plinth-leg/mounting-plate fixing screws (CORE_DOCTRINE.md F11) that happen to share System-32 pitch with the slide mounting pattern, not slides.",
+    "consequence": "This family's mined_cross_check face_distribution (face_2:19, face_4:4, face_3:4, face_1:4 — spread across faces, not concentrated on drawer-side panels) is now suspect for the same reason: the 31-instance training corpus may itself contain plinth-fixing holes mislabeled 'slide_row' by the extractor's pure geometry match, not just real slides. The instance count (31) should be treated as an upper bound on true slide evidence, not a confirmed count.",
+    "resolution_rule_proposed": "A resolver must not emit 'slide' from this diameter+depth+pitch signature alone. It needs the panel's PartRole (drawer_side / drawer_front, or in Forge terms an ancestor NodeKind of 'drawer') as a required co-condition before firing — signature match without a role gate is not sufficient evidence, per DB/20's flag discipline. Until the extractor (doc 16 §2 Source A) is updated to carry PartRole per panel, this rule should be treated as 'drilling pattern only, family attribution unconfirmed' rather than a working slide detector."
+  }
+}

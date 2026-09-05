@@ -1,0 +1,52 @@
+{
+  "_README": "Cited joint-rule table (doc 16 §2 Source C/D, doc 13 rules engine). Confirmat (one-piece self-tapping through-bolt) carcass joint — GTV's budget/fast alternate to cam+dowel per catalog/CORE_DOCTRINE.md F1 'Also' column.",
+  "rule": "confirmat_size_by_panel_thickness",
+  "family": "confirmat",
+  "sources": [
+    {
+      "document": "GTV Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+      "pdf_page": 274,
+      "scope": "confirmat SKUs, transcribed by eye per catalog/packs/gtv_2025_06/connectors_pilot.json 'confirmat'"
+    },
+    {
+      "document": "GTV product page — Confirmat screw 7x50",
+      "url": "https://gtv.com.pl/en/produkt/WK-CF0750-01/",
+      "sku": "WK-CF0750-01",
+      "scope": "confirms diameter 7mm, length 50mm, hex4 drive, steel/galvanized; describes use as 'for permanent joining at right angles (90°) of two furniture boards'. Page number in the master PDF not independently re-confirmed here beyond the pdf_page:274 already on file."
+    }
+  ],
+  "verified": false,
+  "bands": [
+    {
+      "panel_thickness_mm": [16, 16],
+      "confirmat_diameter_mm": 7.0,
+      "confirmat_length_mm": 50,
+      "face_pilot_diameter_mm": 7.0,
+      "face_pilot_depth_mm": 17,
+      "edge_pilot_diameter_mm": 4.5,
+      "sku": "WK-CF0750-01",
+      "confidence": "high — matches 208/209 (99.5%) of every mined confirmat instance across 3 factory projects",
+      "note": "GTV catalogue also lists a Ø6.4mm class (WK-CF6450-01) at the same 50mm length and pdf_page 274 — zero mined instances found for it; factory practice is Ø7 only, per the data on hand."
+    },
+    {
+      "panel_thickness_mm": [16, 16],
+      "confirmat_diameter_mm": 7.0,
+      "face_pilot_depth_mm": 16,
+      "confidence": "low — 1/209 (0.5%) of mined instances, likely a single-panel outlier (possibly a mis-drilled or 15mm-stock panel) rather than a distinct rule."
+    }
+  ],
+  "placement_principles_from_source": [
+    "No manufacturer-published minimum edge distance or pitch table located for this family yet (unlike hinge_count.gtv.json's chart) — flagged as a gap.",
+    "GTV product description confirms the joint is a right-angle (90°) panel-to-panel connection, consistent with the F1 carcass-joint / F2 fixed-shelf use in catalog/CORE_DOCTRINE.md."
+  ],
+  "mined_cross_check": {
+    "source_file": "joint_decisions.dataset.json (v0, 3 projects, prop-0/1/2)",
+    "family_tag": "confirmat",
+    "matches": 209,
+    "depth_class_distribution": { "17mm": "208/209 (99.5%)", "16mm": "1/209 (0.5%)" },
+    "edge_pilot_pairing": "41 of 209 rows have an explicitly matched Ø4.5mm edge pilot on the mating panel in this same extractor pass; joint_decisions.unmatched.txt separately lists 172 unmatched 'deep_pilot edge 4.5 34' holes across all 3 projects — almost certainly the SAME Ø4.5 edge pilots whose confirmat mate sits on a panel outside the extractor's current cross-panel matching window, not a different feature. Total plausible edge-pilot count (172 + 41 = 213) tracks the 209 face-bore count closely, supporting near-1:1 pairing in real practice even though the automated matcher only resolved ~20% of pairs.",
+    "verdict": "Diameter (Ø7), face-bore depth (17mm), and edge-pilot diameter (Ø4.5) are all strongly and consistently confirmed. This is the second-strongest mined family after cam_dowel."
+  },
+  "engine_notes": "Face bore depth (17mm) exceeds the confirmat's own diameter (7mm) but is well short of the 50mm screw length — consistent with a through-panel pilot for the screw shank, not a full-length bore; the remaining ~33mm threads into the second (mating) panel via the Ø4.5 edge pilot. No manufacturer torque/withdrawal figure on hand; doc 16 §4 flags Eckelman's withdrawal/shear equations as the intended source for this once fetched. Promote to verified:true once (a) the edge-distance/pitch gap above is filled from an actual page render of GTV p.274 or the confirmat DIN/ISO standard, and (b) the unmatched-pilot pairing is resolved by an extractor update rather than inferred by count.",
+  "replay_evidence_R43": "DB/37_JOINT_SELECTION_RULES.md §4 replayed a held-out real cabinet outside this file's training corpus: 2 new face Ø7×17mm instances (bottom↔divider corner joint) matched band1 exactly, and the SHKOF ORTA POL/TOM held-out pair added 2 more. No new evidence on the edge-pilot pairing gap or the placement/pitch gap — those remain open exactly as stated above."
+}

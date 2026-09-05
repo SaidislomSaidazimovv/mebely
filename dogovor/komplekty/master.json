@@ -1,0 +1,25 @@
+{
+  "_": "ЧЕРНОВИК — пример формы (DB/44). Всё, включая кузницу (App 3): модификаторы на одной детали — вырез, фаска, выемка.",
+  "id": "master",
+  "nazvanie": { "ru": "Мастер", "uz": "Usta" },
+  "status": "chernovik",
+  "nasleduet": "sverlovka",
+  "vklyucheno": {
+    "kassety": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+    "eksport": ["eman_xlsx", "giblab_project", "swj008", "pdf_pasport"],
+    "kuznitsa": ["vyrez", "skruglenie", "vyemka", "paz", "faska", "skleyka", "povorot"],
+    "biblioteka": "publikaciya",
+    "render": "fizicheskiy"
+  },
+  "limity": {
+    "mebel_v_nedelyu": null,
+    "shkafov_v_proekte": null,
+    "proektov": null,
+    "materialov_v_palitre": 8
+  },
+  "politsiya": { "klassy": ["CE", "SENSE", "GEO", "CONS"], "otklyuchit": [] },
+  "profil": "QORASU_PROFILE",
+  "predlozheniya": [],
+  "cena": null,
+  "pochemu": "Полный комплект. Здесь нет правил роста — человеку, который купил всё, больше ничего не предлагают (этика: оплаченное не закрывают и не допродают)."
+}

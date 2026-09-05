@@ -1,0 +1,41 @@
+{
+  "_": "КОНТРОЛЬ КОМПЛЕКТОВ (DB/44 §2). Один файл = один комплект. Правится в Пульте, не руками разработчика. kontrol сверяет каждый файл с этой схемой и с _yadro.json — чужой ключ, чужое значение, касание ядра = 🔴, мерж закрыт.",
+  "*": {
+    "strogo": true,
+    "klyuchi": {
+      "id":          { "tip": "tekst", "pochemu": "совпадает с именем файла без .json" },
+      "nazvanie":    { "tip": "obekt", "klyuchi": { "ru": { "tip": "tekst" }, "uz": { "tip": "tekst" } } },
+      "status":      { "tip": "vybor", "varianty": ["chernovik", "aktivno", "arhiv"],
+                       "pochemu": "разработчик не имеет права ставить aktivno — только Пульт после диффа" },
+      "nasleduet":   { "tip": "tekst_ili_null", "pochemu": "один уровень наследования, не каскад (R52 решит глубже)" },
+      "vklyucheno":  { "tip": "obekt", "klyuchi": {
+        "kassety":    { "tip": "spisok", "varianty": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+                        "pochemu": "= prilozhenie/cartridges/* — kontrol сверяет с реальными папками" },
+        "eksport":    { "tip": "spisok", "varianty": ["eman_xlsx", "giblab_project", "swj008", "pdf_pasport"],
+                        "pochemu": "раскрой = eman_xlsx (готов) · сверловка = giblab_project/swj008 · паспорт = R31" },
+        "kuznitsa":   { "tip": "spisok", "varianty": ["vyrez", "skruglenie", "vyemka", "paz", "faska", "skleyka", "povorot"],
+                        "pochemu": "= kuznitsa/cartridges/* — пустой список = кузница недоступна" },
+        "biblioteka": { "tip": "vybor", "varianty": ["net", "lichnaya", "obshaya", "publikaciya"],
+                        "pochemu": "net → lichnaya (свои блоки) → obshaya (читать общие) → publikaciya (делиться)" },
+        "render":     { "tip": "vybor", "varianty": ["net", "bystryy", "fizicheskiy"],
+                        "pochemu": "боль Шахзода: fizicheskiy = комната + реальный свет" }
+      } },
+      "limity":      { "tip": "obekt", "klyuchi": {
+        "mebel_v_nedelyu":       { "tip": "chislo_ili_null", "min": 1, "pochemu": "null = без лимита. Лимит объявляется ДО работы (этика)" },
+        "shkafov_v_proekte":     { "tip": "chislo_ili_null", "min": 1 },
+        "proektov":              { "tip": "chislo_ili_null", "min": 1 },
+        "materialov_v_palitre":  { "tip": "chislo", "min": 1, "max": 8, "pochemu": "контракт MAX_PALETTE_ENTRIES_PER_GROUP = 8 (DB/40)" }
+      } },
+      "politsiya":   { "tip": "obekt", "klyuchi": {
+        "klassy":     { "tip": "spisok", "varianty": ["CE", "GEO", "CONS", "DET", "SENSE"],
+                        "pochemu": "CE обязателен всегда — _yadro.json. Остальные — что показывать пользователю" },
+        "otklyuchit": { "tip": "spisok", "elementy": "tekst",
+                        "pochemu": "id правил, которые комплект глушит. Правило класса CE здесь = 🔴" }
+      } },
+      "profil":      { "tip": "tekst", "pochemu": "стартовый ConstructionProfile (dvizhok/catalogs/profiles.ts)" },
+      "predlozheniya": { "tip": "spisok", "elementy": "tekst", "pochemu": "id правил роста (PR-N) из dogovor/predlozheniya/, активных для этого комплекта" },
+      "cena":        { "tip": "null", "pochemu": "цена не считается и не хранится здесь — решение основателя 2026-08-22" },
+      "pochemu":     { "tip": "tekst", "pochemu": "зачем этот комплект существует — комплект без причины = шум" }
+    }
+  }
+}

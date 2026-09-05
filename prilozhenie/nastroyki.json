@@ -1,0 +1,6 @@
+{
+  "_": "НАСТРОЙКИ ПРИЛОЖЕНИЯ — маршрут и поведение экранов.",
+  "marshrut": ["pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+  "smeta_mozhno_vyklyuchit": true,
+  "avtosohranenie_sek": 30
+}

@@ -1,0 +1,8 @@
+{
+  "id": "peredacha",
+  "titleRu": "Передача",
+  "api": "cartridge-api@1",
+  "owner": "said",
+  "source": "Mebelchi 2/apps/app/screens/HandoffScreen.tsx",
+  "version": "0.0.0"
+}

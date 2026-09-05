@@ -1,0 +1,25 @@
+{
+  "_": "ЧЕРНОВИК — пример формы (DB/44). Боль Шахзода: он теряет сделки из-за визуала и рисует на бумаге. Наш рендер — комната + реальный свет, реальные размеры, всё редактируется и влияет на результат.",
+  "id": "vizual",
+  "nazvanie": { "ru": "Визуал", "uz": "Vizual" },
+  "status": "chernovik",
+  "nasleduet": "raskroy",
+  "vklyucheno": {
+    "kassety": ["hub", "pomeshenie", "varianty", "konstruktor", "render", "inzheneria", "smeta", "peredacha"],
+    "eksport": ["eman_xlsx", "pdf_pasport"],
+    "kuznitsa": [],
+    "biblioteka": "publikaciya",
+    "render": "fizicheskiy"
+  },
+  "limity": {
+    "mebel_v_nedelyu": null,
+    "shkafov_v_proekte": null,
+    "proektov": null,
+    "materialov_v_palitre": 8
+  },
+  "politsiya": { "klassy": ["CE", "SENSE"], "otklyuchit": [] },
+  "profil": "QORASU_PROFILE",
+  "predlozheniya": ["PR-2"],
+  "cena": null,
+  "pochemu": "Комплект для тех, кто продаёт бюджетную мебель и проигрывает сделки без картинки. Рендер и PDF-паспорт — это «можно посмотреть?» по телефону, на которое наконец есть ответ."
+}

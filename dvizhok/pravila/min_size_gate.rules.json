@@ -1,0 +1,243 @@
+{
+  "_README": "First rule table for the minimum-size gate (DB/32_THREE_APP_CONSTITUTION.md §4.5, Researches/-r14 finding B3). Companion to DB/37_MINIMUM_SIZE_GATE.md — read that doc for the full reasoning; this file is the machine-readable minimums the gate (GEO-8/GEO-9, proposed) tests against. Two shapes of entry: 'envelope' content types are a fixed minimum checked as a binary fit; 'formula' content types (shelf) are evaluated live against a formula, span and declared load — there is no static minimum_mm for those.",
+  "rule": "minimum_size_gate",
+  "family": "content_minimum_envelope",
+  "status": "NEW — no prior version of this table existed. Drafted from directly viewing catalog page renders (not from the browse-grade accessory JSON, which carries no numeric tables).",
+  "verified": false,
+
+  "validation_profile": {
+    "_README": "Used ONLY at publish-gate time (DB/37 §4/§5), never as a per-project default. A Component with no fit_constraint badge passed the gate at this profile.",
+    "thickness_mm": 18,
+    "layers": 2,
+    "effective_wall_mm": 36,
+    "groove_or_kromka_credit_mm": 0,
+    "rationale": "Worst plausible board (18mm) + R14 finding B2's laminate rule (layers × profile_thickness) + no credit for material grooves/kromka ever removing wall, never adding it. Deliberately NOT the DB/25 census default (16mm, Qorasu-specific) — see DB/37 §4 for why the census must not drive this number.",
+    "sources": [
+      { "document": "Researches/-r14 Redteam bound-detached and nesting.md", "finding": "B2", "scope": "laminate thickness = layers × profile_thickness, currently computed wrong" },
+      { "document": "Researches/-r14 Redteam bound-detached and nesting.md", "finding": "B3", "scope": "states the problem this profile answers" },
+      { "document": "DB/25_NUANCE_CENSUS_FINDINGS.md", "finding": "F1", "scope": "18mm = 0/359 panels at Qorasu — cited as the reason 18mm must still be the validation worst-case for a cross-workshop library, not evidence against using it" }
+    ]
+  },
+
+  "content_types": [
+    {
+      "content_type": "drawer_class_N",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 80,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX / LEGRABOX pure & free — 'Overview – applications' table, 'Drawer – N' row, Standard cabinet / Drawer, Space requirement Height column"
+      }
+    },
+    {
+      "content_type": "drawer_class_M",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 106,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX 'Drawer – M' row, same table"
+      },
+      "cross_check": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 296,
+        "scope": "TANDEMBOX antaro 'Drawer – M' page: drawer side height 83.6mm (physical steel side), interior dimension 98.5mm shown in space-requirement diagram — DIFFERENT measurement convention than LEGRABOX's 'Space requirement Height' column, do not average across product lines"
+      }
+    },
+    {
+      "content_type": "drawer_class_K",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 144,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX 'Drawer – K' row, same table"
+      }
+    },
+    {
+      "content_type": "inner_drawer_class_M",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 104,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX 'Inner drawer – M' row, same table"
+      }
+    },
+    {
+      "content_type": "inner_drawer_class_K",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 142,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX 'Inner drawer – K' row, same table"
+      }
+    },
+    {
+      "content_type": "high_fronted_pullout_C",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 193,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX pure and LEGRABOX free 'High fronted pull-out – C' rows (identical figure both systems), same table"
+      }
+    },
+    {
+      "content_type": "high_fronted_pullout_F",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 257,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX pure 'High fronted pull-out – F' row, same table"
+      }
+    },
+    {
+      "content_type": "inner_pullout_gallery_C",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 191,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 198,
+        "scope": "LEGRABOX 'Inner pull-out – design element / gallery – C' rows, same table"
+      }
+    },
+    {
+      "content_type": "metabox_320m_drawer_M",
+      "shape": "envelope",
+      "minimum_interior_height_mm": 110,
+      "minimum_interior_height_inner_drawer_mm": 113,
+      "severity": "block",
+      "gate_stage": ["publish", "export"],
+      "warn_stage": ["edit"],
+      "source": {
+        "document": "Blum Catalogue and technical manual 2024-2025 en.pdf",
+        "printed_page": 344,
+        "scope": "METABOX 320M single extension, 'Drawer | inner drawer – M', drawer side height 86mm, space-requirement diagram figures 110 (drawer) / 113 (inner drawer)"
+      }
+    },
+    {
+      "content_type": "gtv_versalite_h45_drawer_box",
+      "shape": "envelope",
+      "minimum_interior_height_mm": null,
+      "status": "UNGROUNDED",
+      "severity": "block_once_cited",
+      "placeholder_minimum_interior_height_mm": 80,
+      "placeholder_source_note": "No GTV-published minimum height found. Placeholder borrows the lowest cross-brand cited class (LEGRABOX N, 80mm) as a conservative floor — NOT a citation, an engineering assumption. This is CORE_DOCTRINE.md's F7 default and the market's actual dominant practice per DB/22 (Ulugbek) and DB/25 (46% of census panels are drawer parts, i.e. shop-built wooden boxes, not integrated steel systems) — so this gap matters more than any cited row above.",
+      "source": {
+        "document": "Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+        "pdf_pages_cited_by_accessory_record": [146, 147, 148],
+        "pdf_pages_actually_rendered_this_pass": [144, 145],
+        "discrepancy": "Pages actually viewed (printed 144-145, 'VERSALITE LIGHT' and 'PRESTIGE' H45 ball-bearing slides) show nominal-length and mounting-hole tables only, no vertical envelope/minimum-height figure. Page citation on the existing accessory record (catalog/packs/core_2026_06/accessories/gtv_bb_slide_h45.json) does not match what was rendered — flagged for the catalog maintainer, not resolved in this pass."
+      }
+    },
+    {
+      "content_type": "wardrobe_rod_section",
+      "shape": "envelope",
+      "minimum_interior_depth_mm": null,
+      "status": "UNGROUNDED",
+      "severity": "block_once_cited",
+      "placeholder_minimum_interior_depth_mm": 580,
+      "placeholder_source_note": "Common industry convention (hanger arm ~450-500mm + rear clearance). NOT sourced to any document in this repo.",
+      "source": {
+        "document": "Furniture-Accessories-2025-PL-EN-UA-HU-6.pdf",
+        "pdf_pages_cited_by_accessory_record": [290, 291],
+        "discrepancy": "catalog/packs/core_2026_06/accessories/gtv_wardrobe_rail.json cites these pages; viewing them directly shows the GTV ELITE metal pull-out basket, not the wardrobe hanging rail. Likely a pre-existing mis-citation in the accessory record, not introduced or fixed here."
+      }
+    },
+    {
+      "content_type": "hand_finger_clearance",
+      "shape": "envelope",
+      "minimum_clearance_mm": null,
+      "status": "UNGROUNDED",
+      "severity": "block_once_cited",
+      "placeholder_source_note": "General furniture-ergonomics convention (~20mm finger-pull recess) commonly cited in the trade; no document in this repo's catalog covers it. Needs its own short research pass.",
+      "source": null
+    },
+    {
+      "content_type": "door_swing_clearance",
+      "shape": "external_clearance",
+      "note": "Structurally different from the other envelope rows — this checks the swing arc against the NEIGHBORING Space/room geometry, not the door's own Space. Closer to DB/20 GEO-5 (fronts cover openings) than to a size minimum. The catalog already carries opening-angle-specific hinge SKUs (gtv_hinge_45_90, gtv_hinge_165, gtv_hinge_glass) implying per-SKU swing-arc data exists in source PDFs but has not been extracted into a clearance table.",
+      "minimum_clearance_mm": null,
+      "status": "UNGROUNDED",
+      "severity": "block_once_cited",
+      "source": null
+    },
+    {
+      "content_type": "shelf_span",
+      "shape": "formula",
+      "severity": "warn",
+      "gate_stage": ["edit", "publish", "export"],
+      "warn_not_block_rationale": "Deflection is continuous and load-dependent, unlike the binary envelope checks above. Matches DB/32 §4.5's own instruction to warn/block 'the same way' the existing прогиб (excess-span) amber warning already does — that precedent is WARN, not BLOCK.",
+      "formula": {
+        "deflection": "delta = 5 * q * L^4 / (384 * E * I)",
+        "boundary_condition": "simply_supported",
+        "boundary_condition_rationale": "Shelf on Ø5 pins or in an unglued groove — matches this system's construction (shelf_pin.rules.json; DB/25 F3 groove is universal but not glued to the shelf itself).",
+        "I": "b * h^3 / 12",
+        "I_note": "h = shelf thickness (actual, not nominal), b = shelf depth (front-to-back)",
+        "deflection_limit": "L / 240",
+        "creep_multiplier": 1.5,
+        "creep_note": "Apply as 1.5 * delta_elastic <= L/240 for the long-term check, not the instantaneous value alone."
+      },
+      "material_constants": {
+        "ldsp_p2_E_Nmm2": 1600,
+        "ldsp_p2_E_source": "EN 312:2010 bending-MOE table, thickness band >13-20mm; corroborated independently by EGGER Eurospan E1 P2 and Kronospan Trading P2 technical datasheets (both publish 1600 N/mm2 for the same band)",
+        "mdf_E_Nmm2": 2400,
+        "mdf_E_source": "Kronospan MDF and MEDITE MR technical datasheets, EN 310 bending-MOE, 12-19mm band; EN minimum floor 2200 N/mm2, better grades reach >=2700 N/mm2 per a cited DoP",
+        "default_shelf_thickness_mm": 16,
+        "default_shelf_thickness_source": "DB/25_NUANCE_CENSUS_FINDINGS.md F1 — 9/9 census shelf panels are 16mm, 0/359 total panels are 18mm. Qorasu-specific default, NOT the validation-profile thickness (see validation_profile block above)."
+      },
+      "declared_load_q": {
+        "status": "OPEN — no default cited anywhere in this repo, including catalog/CORE_DOCTRINE.md",
+        "note": "Founder decision needed. Furniture-shelving literature surveyed for R33 commonly cites 15-20 kg per running metre for books/kitchenware as a conservative UI default; not adopted here as authoritative, only as a starting point for that decision."
+      },
+      "source": {
+        "document": "Researches/-r10 ReadyCodes 29-34.md",
+        "scope": "R33 answer, cited verbatim — Euler-Bernoulli shelf deflection, real E values for ЛДСП/МДФ, boundary condition for pin/groove shelves"
+      }
+    }
+  ],
+
+  "severity_tier_mapping": {
+    "_README": "Proposed additions to DB/20_ENGINE_INVARIANTS.md §2 GEO tier — proposed in DB/37 §3, not applied to that legislation doc here.",
+    "GEO-8": "Minimum content envelope — no Space's derived interior dimensions fall below the cited minimum for its declared content type, at the profile in force at the check. Covers all 'envelope' shape rows above.",
+    "GEO-9": "External clearance (swing/reach) — a door/drawer-front's swing arc or hand-clearance zone does not intersect neighboring built geometry. Covers 'external_clearance' shape rows above.",
+    "shelf_span": "No new GEO id — stays on the existing прогиб (excess-span) warning mechanism, extended to the shrink direction."
+  },
+
+  "gate_stages": {
+    "_README": "See DB/37 §5 for full reasoning.",
+    "edit": { "profile_used": "live project ConstructionProfile", "blocking": false, "invariant_subset": "cheap subset only (envelope rows), matches DB/20 §3.1's 'cheap enough for the gesture path' bar" },
+    "publish": { "profile_used": "validation_profile (this file, top-level block)", "blocking": "for the unconditional fit badge only — a failing Component is not rejected, it is labeled per DB/37 §4", "invariant_subset": "full GEO-8/GEO-9 set" },
+    "export": { "profile_used": "real project ConstructionProfile", "blocking": true, "invariant_subset": "full GEO-8/GEO-9 set, DB/20 §3.2 hard gate, never auto-fixed" }
+  },
+
+  "engine_notes": "This table assumes Researches/-r14 finding B2 (laminate thickness = layers × profile_thickness) is fixed before any of these numbers are wired into extentAlong() or its successor — otherwise every nested-child fit check inherits B2's known bug. Cross-brand equivalence (Blum vs Hettich N/M/K-style classes) is NOT assumed; Hettich AvanTech YOU / InnoTech Atira were not independently measured this pass. Do not promote verified:true on any row until: (1) the GTV VERSALITE H45 page-citation discrepancy is corrected and the actual minimum re-checked, (2) the wardrobe-rail page discrepancy is corrected, (3) hand-clearance and door-swing rows get their own citations, (4) the declared_load_q founder decision is made."
+}
