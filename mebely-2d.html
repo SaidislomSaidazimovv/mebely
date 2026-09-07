@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mebely 2D — qoidalar bilan boshqariladigan fasad</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a21; --panel2:#1d222b; --line:#2a313d; --ink:#e7ecf3;
+    --mut:#93a0b4; --acc:#00ac7a; --acc2:#3b82f6; --warn:#e0a83b; --bad:#e5484d;
+    --carcass:#c9b18a; --carcassEdge:#8a744f; --door:#e9dcc3; --shelf:#a98f66; --divider:#8a744f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
+    font:14px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  header{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.2px}
+  header .sp{flex:1}
+  header .badge{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:2px 9px}
+  button{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    padding:6px 11px;cursor:pointer;transition:.12s}
+  button:hover{border-color:var(--acc);color:#fff}
+  button.acc{background:var(--acc);border-color:var(--acc);color:#062}
+  button.ghost{background:transparent}
+  input,textarea,select{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+  input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+  main{flex:1;display:flex;min-height:0}
+  /* stage */
+  #stage{flex:1;position:relative;overflow:hidden;background:
+    radial-gradient(circle at 30% 20%,#1a1f28,#0f1115 70%)}
+  #svgwrap{position:absolute;inset:0}
+  svg{width:100%;height:100%;display:block}
+  #hint{position:absolute;left:14px;bottom:12px;color:var(--mut);font-size:12px;pointer-events:none}
+  /* side */
+  aside{width:390px;min-width:340px;max-width:46vw;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line)}
+  .tabs{display:flex;border-bottom:1px solid var(--line)}
+  .tabs button{border:0;border-radius:0;flex:1;background:transparent;color:var(--mut);padding:10px;border-bottom:2px solid transparent}
+  .tabs button.on{color:#fff;border-bottom-color:var(--acc)}
+  .tabpane{flex:1;min-height:0;display:none;flex-direction:column}
+  .tabpane.on{display:flex}
+  /* chat */
+  #log{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+  .msg{padding:8px 11px;border-radius:10px;max-width:92%;white-space:pre-wrap;word-break:break-word}
+  .msg.u{align-self:flex-end;background:var(--acc2);color:#fff;border-bottom-right-radius:3px}
+  .msg.b{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:3px}
+  .msg.sys{align-self:center;color:var(--mut);font-size:12px;background:transparent;max-width:100%}
+  .msg .added{color:var(--acc);font-size:12px;margin-top:4px}
+  .composer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+  .composer input{flex:1}
+  /* rules */
+  #rules{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .rule{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
+  .rule .t{font-weight:650;color:var(--acc);text-transform:uppercase;font-size:11px;letter-spacing:.4px}
+  .rule .body{flex:1;font-size:12.5px;color:var(--ink)}
+  .rule .x{cursor:pointer;color:var(--mut);border:0;background:transparent;padding:0 4px}
+  .rule .x:hover{color:var(--bad)}
+  .rule.flash{animation:flash 1.1s ease}
+  @keyframes flash{0%{border-color:var(--acc);box-shadow:0 0 0 2px rgba(0,172,122,.4)}100%{border-color:var(--line);box-shadow:none}}
+  .rowbtns{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-top:1px solid var(--line)}
+  .rowbtns button{font-size:12.5px;padding:5px 9px}
+  .empty{color:var(--mut);text-align:center;padding:26px 10px;font-size:13px}
+  /* settings */
+  #settings{padding:14px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+  #settings label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
+  .field{}
+  .note{font-size:11.5px;color:var(--mut)}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12px}
+  .ok{color:var(--acc)} .bad{color:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mebely · 2D</h1>
+  <span class="badge" id="stat">qoidalar: 0</span>
+  <span class="sp"></span>
+  <button class="ghost" id="fitBtn" title="Ko'rinishga moslash">⤢ Fit</button>
+  <button class="ghost" id="clearBtn" title="Hammasini tozalash">🗑 Tozalash</button>
+</header>
+<main>
+  <section id="stage">
+    <div id="svgwrap"><svg id="svg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div id="hint">Old ko'rinish (fasad). O'ngда chatbotga yozing — masalan: «2 ta shkaf qo'y, orasida bitta stoyka».</div>
+  </section>
+  <aside>
+    <div class="tabs">
+      <button data-tab="chat" class="on">Chatbot</button>
+      <button data-tab="rulesTab">Qoidalar</button>
+      <button data-tab="setTab">Sozlama</button>
+    </div>
+
+    <div class="tabpane on" id="chat">
+      <div id="log"></div>
+      <div class="composer">
+        <input id="inp" placeholder="Masalan: 3 ta shkaf, har birida 2 polka…" autocomplete="off" />
+        <button class="acc" id="send">➤</button>
+      </div>
+    </div>
+
+    <div class="tabpane" id="rulesTab">
+      <div id="rules"></div>
+      <div class="rowbtns">
+        <button data-add="cabinet">+ Shkaf</button>
+        <button data-add="divider">+ Stoyka</button>
+        <button data-add="shelves">+ Polka</button>
+        <button data-add="door">+ Eshik</button>
+        <button class="ghost" id="dlBtn">⇩ JSON</button>
+      </div>
+    </div>
+
+    <div class="tabpane" id="setTab">
+      <div id="settings">
+        <div class="field">
+          <label>Gemini API kaliti (sizniki — faqat brauzeringizда saqlanadi)</label>
+          <input id="key" type="password" placeholder="AIza…" />
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input id="model" placeholder="gemini-2.0-flash" />
+          <div class="note">Masalan: <code>gemini-2.0-flash</code>, <code>gemini-2.5-flash</code>, <code>gemini-1.5-flash</code>. Sizда mavjud modelни yozing.</div>
+        </div>
+        <button class="acc" id="saveKey">Saqlash</button>
+        <div class="note" id="keyStat"></div>
+        <div class="note" style="margin-top:10px">
+          Kalit <b>faylда emas</b> — brauzeringizning <code>localStorage</code>'ида. Google Gemini API brauzerдан to'g'ridan-to'g'ri chaqiriladi, proxy shart emas.
+          Bu shaxsiy/demo asbob uchun. Kalitni <b>hech kimга ulamang</b>.
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<script>
+"use strict";
+/* ─────────────────────────────────────────────────────────────────────────
+   Mebely 2D — qoidalar bilan boshqariladigan fasad (algoritm 0dan).
+   Yagona haqiqat manbai = RULES (qoidalar). Chatbot (Gemini) NL → qoida → RULES.
+   2D fasad RULES'дан render qilinadi. Domen o'lchovlari — Mebelchi konvensiyasidan
+   (16mm плита, System-32 polka, bazaviy shkaf ~600×720) qayta ishlatilган.
+   ───────────────────────────────────────────────────────────────────────── */
+
+const LS = { rules:"mebely2d_rules", key:"mebely2d_gkey", model:"mebely2d_gmodel" };
+const MM = 16;                       // плита qalinligi (mm) — domen konvensiyasi
+const DEF = { width_mm:600, height_mm:720, depth_mm:560 }; // bazaviy shkaf
+const DOOR_STYLES = ["gladkiy","frezerovka","ramka","styoklo","bez"]; // domendан soddalashtirilган
+
+/* ── STATE ── */
+let rules = load(LS.rules, []);
+let uid = Math.max(0, ...rules.map(r=>+String(r.id).replace(/\D/g,"")||0));
+const nid = () => "r"+(++uid);
+
+function load(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
+function save(){ try{ localStorage.setItem(LS.rules, JSON.stringify(rules)) }catch{} }
+
+/* ── ALGORITM (0dan): RULES → SCENE ──
+   Har bir «cabinet» qoidasi (count bilan) shkaflar yaratadi. Keyin divider/shelves/door
+   qoidalari shkaflarга qo'llanadi (target: индекс yoki "all"/"last"). Natija — SCENE. */
+function buildScene(){
+  const cabs = [];
+  const push = r => cabs.push({
+    w: num(r.width_mm, DEF.width_mm), h: num(r.height_mm, DEF.height_mm),
+    d: num(r.depth_mm, DEF.depth_mm), dividers:0, shelves:0, door:null, ruleId:r.id
+  });
+  for(const r of rules) if(r.type==="cabinet"){ const n=Math.max(1,num(r.count,1)); for(let i=0;i<n;i++) push(r); }
+
+  const targets = (t) => {
+    if(t==null || t==="all") return cabs.map((_,i)=>i);
+    if(t==="last") return cabs.length? [cabs.length-1] : [];
+    const i = num(t,-1); return (i>=0 && i<cabs.length)? [i] : [];
+  };
+  for(const r of rules){
+    if(r.type==="divider"){ // "between":[a,b] yoki cabinet index; sonи = count
+      if(Array.isArray(r.between) && r.between.length>=2){
+        // ikki shkaf ORASIDA stoyka = ularни tutashtirган alohida vertikal panel — soddalashtirilган:
+        // o'ng shkafning chap tomonига stoyka belgisi (yoki alohida ingichka shkaf).
+        const b = Math.min(...r.between.map(x=>num(x,0)));
+        if(b>=0 && b<cabs.length) cabs[b].dividers = Math.max(cabs[b].dividers, num(r.count,1));
+      } else for(const i of targets(r.cabinet)) cabs[i].dividers += num(r.count,1);
+    }
+    else if(r.type==="shelves") for(const i of targets(r.cabinet)) cabs[i].shelves = num(r.count,3);
+    else if(r.type==="door") for(const i of targets(r.cabinet)) cabs[i].door = String(r.style||"gladkiy");
+  }
+  return cabs;
+}
+const num = (v,d)=> Number.isFinite(+v)? +v : d;
+
+/* ── RENDER: SCENE → SVG fasad ── */
+const svg = document.getElementById("svg");
+let view = { fit:true };
+function render(){
+  const cabs = buildScene();
+  document.getElementById("stat").textContent = "qoidalar: "+rules.length;
+  renderRules();
+  if(!cabs.length){ svg.innerHTML = `<text x="500" y="350" fill="#5a6474" font-size="20" text-anchor="middle">Bo'sh — qoida qo'shing</text>`; return; }
+
+  const GAP = 40;               // shkaflar orasi (mm, ko'rinish uchun)
+  const totalW = cabs.reduce((s,c)=>s+c.w,0) + GAP*(cabs.length-1);
+  const maxH = Math.max(...cabs.map(c=>c.h));
+  const pad = 120;
+  const vw = totalW + pad*2, vh = maxH + pad*2 + 90; // +90 = pastда o'lchov yozuvi
+  svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+
+  const floorY = pad + maxH;    // pol chizig'i (fasad pasti)
+  let x = pad;
+  const parts = [];
+  // pol
+  parts.push(`<line x1="${pad-30}" y1="${floorY}" x2="${vw-pad+30}" y2="${floorY}" stroke="#3a424f" stroke-width="3"/>`);
+
+  cabs.forEach((c,idx)=>{
+    const y = floorY - c.h;
+    // korpus
+    parts.push(rect(x,y,c.w,c.h, "var(--carcass)","var(--carcassEdge)",3));
+    // ички bo'shliq (плита qalinligi)
+    const ix=x+MM, iy=y+MM, iw=c.w-2*MM, ih=c.h-2*MM;
+    parts.push(rect(ix,iy,iw,ih,"#1b2029","#3a3125",1));
+    // stoykalar (vertikal) → отсеклар
+    const comp = c.dividers+1;
+    const cellW = (iw - c.dividers*MM)/comp;
+    const cellX = [];
+    let cx=ix;
+    for(let k=0;k<comp;k++){ cellX.push([cx,cellW]); cx+=cellW; if(k<comp-1){ parts.push(rect(cx,iy,MM,ih,"var(--divider)","#5c4a2c",1)); cx+=MM; } }
+    // polkalar (har отсекда, teng) + eshik
+    for(const [px,pw] of cellX){
+      if(c.shelves>0){
+        for(let s=1;s<=c.shelves;s++){ const sy = iy + ih*s/(c.shelves+1); parts.push(`<line x1="${px}" y1="${sy}" x2="${px+pw}" y2="${sy}" stroke="var(--shelf)" stroke-width="${MM}" stroke-opacity=".85"/>`); }
+      }
+      if(c.door && c.door!=="bez"){
+        parts.push(rect(px+4,iy+4,pw-8,ih-8,"rgba(233,220,195,.14)","var(--door)",1.5));
+        parts.push(`<circle cx="${px+pw-16}" cy="${iy+ih/2}" r="4" fill="var(--door)"/>`); // ruchka
+      }
+    }
+    // o'lchov
+    parts.push(`<text x="${x+c.w/2}" y="${floorY+34}" fill="#93a0b4" font-size="20" text-anchor="middle">${c.w}×${c.h}</text>`);
+    parts.push(`<text x="${x+c.w/2}" y="${floorY+58}" fill="#5a6474" font-size="15" text-anchor="middle">${labelOf(c)}</text>`);
+    x += c.w + GAP;
+  });
+  svg.innerHTML = parts.join("");
+}
+function rect(x,y,w,h,fill,stroke,sw){ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>` }
+function labelOf(c){ const a=[]; if(c.dividers)a.push(c.dividers+" stoyka"); if(c.shelves)a.push(c.shelves+" polka"); if(c.door&&c.door!=="bez")a.push(c.door); return a.join(" · ")||"bo'sh"; }
+
+/* ── RULES panel ── */
+function renderRules(){
+  const box = document.getElementById("rules");
+  if(!rules.length){ box.innerHTML = `<div class="empty">Qoida yo'q.<br>Chatbotga yozing yoki pastдаги tugmalar.</div>`; return; }
+  box.innerHTML = rules.map(r=>`
+    <div class="rule" data-id="${r.id}">
+      <span class="t">${esc(r.type)}</span>
+      <span class="body">${esc(desc(r))}</span>
+      <button class="x" title="o'chirish">✕</button>
+    </div>`).join("");
+  box.querySelectorAll(".x").forEach(b=> b.onclick = e=>{ const id=e.target.closest(".rule").dataset.id; rules=rules.filter(r=>String(r.id)!==id); save(); render(); });
+}
+function desc(r){
+  if(r.type==="cabinet") return `${r.count||1} dona · ${r.width_mm||DEF.width_mm}×${r.height_mm||DEF.height_mm}×${r.depth_mm||DEF.depth_mm} mm`;
+  if(r.type==="divider") return r.between? `${r.between[0]}–${r.between[1]} shkaflar orasida ${r.count||1} stoyka` : `shkaf «${r.cabinet??"all"}» → ${r.count||1} stoyka`;
+  if(r.type==="shelves") return `shkaf «${r.cabinet??"all"}» → ${r.count||3} polka`;
+  if(r.type==="door") return `shkaf «${r.cabinet??"all"}» → eshik: ${r.style||"gladkiy"}`;
+  return JSON.stringify(r);
+}
+const esc = s=> String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ── qoida qo'shish (chatbot yoki qo'lда) ── */
+function addRules(list, flash){
+  const ids=[];
+  for(const r of list){ if(!r||!r.type) continue; r.id = nid(); rules.push(r); ids.push(r.id); }
+  save(); render();
+  if(flash) ids.forEach(id=>{ const el=document.querySelector(`.rule[data-id="${id}"]`); if(el){ el.classList.add("flash"); } });
+  return ids.length;
+}
+
+/* ── manual tugmalar ── */
+document.querySelectorAll("[data-add]").forEach(b=> b.onclick = ()=>{
+  const t=b.dataset.add;
+  if(t==="cabinet") addRules([{type:"cabinet",count:1,...DEF}],true);
+  else if(t==="divider") addRules([{type:"divider",cabinet:"last",count:1}],true);
+  else if(t==="shelves") addRules([{type:"shelves",cabinet:"all",count:3}],true);
+  else if(t==="door") addRules([{type:"door",cabinet:"all",style:"gladkiy"}],true);
+  switchTab("rulesTab");
+});
+
+/* ── tabs, fit, clear, download ── */
+function switchTab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id===id)); }
+document.querySelectorAll(".tabs button").forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
+document.getElementById("fitBtn").onclick = ()=>render();
+document.getElementById("clearBtn").onclick = ()=>{ if(confirm("Hamma qoidани o'chirishmi?")){ rules=[]; save(); render(); } };
+document.getElementById("dlBtn").onclick = ()=>{
+  const blob=new Blob([JSON.stringify({version:1,rules},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="mebely-rules.json"; a.click();
+};
+
+/* ── Gemini chatbot ── */
+const gkey = ()=> load(LS.key,"");
+const gmodel = ()=> load(LS.model,"") || "gemini-2.0-flash";
+document.getElementById("key").value = gkey();
+document.getElementById("model").value = gmodel();
+document.getElementById("saveKey").onclick = ()=>{
+  localStorage.setItem(LS.key, JSON.stringify(document.getElementById("key").value.trim()));
+  localStorage.setItem(LS.model, JSON.stringify(document.getElementById("model").value.trim()));
+  const s=document.getElementById("keyStat"); s.innerHTML = gkey()? `<span class="ok">✔ saqlandi</span>` : `<span class="bad">kalit bo'sh</span>`;
+};
+document.getElementById("keyStat").innerHTML = gkey()? `<span class="ok">✔ kalit bор</span>` : "kalit kiritilmagan";
+
+const log = document.getElementById("log");
+function chat(role,text,addedN){
+  const d=document.createElement("div"); d.className="msg "+(role==="u"?"u":role==="sys"?"sys":"b"); d.textContent=text;
+  if(addedN){ const a=document.createElement("div"); a.className="added"; a.textContent=`＋ ${addedN} ta qoida qo'shildi → Qoidalar`; d.appendChild(a); }
+  log.appendChild(d); log.scrollTop=log.scrollHeight;
+}
+chat("sys","Salom! Tabiiy tilда yozing — «2 shkaf, orasida stoyka», «hammasига 3 polka», «birinchi shkafga gladkiy eshik». Qoidани tushunib, Qoidalar fayliga qo'shaman, fasad yangilanadi.");
+
+const SYS = `Sen mebel dizayn yordamchисisan. Foydalanuvchining tabiiy til (o'zbek/rus) so'rovини QOIDA obyektlarига aylantirasan.
+Faqat JSON qaytar: {"reply": "<qisqa javob>", "rules": [ <qoida obyektlari> ]}.
+Qoida turlari:
+- {"type":"cabinet","count":<son>,"width_mm":<mm>,"height_mm":<mm>,"depth_mm":<mm>}  // shkaf(lar) qo'shish. Default 600×720×560.
+- {"type":"divider","cabinet":<индекс|"all"|"last">,"count":<son>}  yoki  {"type":"divider","between":[<i>,<j>],"count":<son>}  // stoyka
+- {"type":"shelves","cabinet":<индекс|"all"|"last">,"count":<son>}  // polkalar
+- {"type":"door","cabinet":<индекс|"all"|"last">,"style":"gladkiy|frezerovka|ramka|styoklo|bez"}  // eshik
+Shkaflar 0dan indekslanadi. "rules" — MAVJUD qoidalarга QO'SHILADIGAN yangилар. Agar so'rov noaniq bo'lsa, "rules":[] va "reply"да savol ber.`;
+
+async function askGemini(userText){
+  const key=gkey(); if(!key){ chat("b","⚠ Avval «Sozlama»да Gemini kalitини kiriting."); switchTab("setTab"); return; }
+  const ctx = `Hozirgi qoidalar (kontekst): ${JSON.stringify(rules)}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(gmodel())}:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    system_instruction:{ parts:[{ text: SYS }] },
+    contents:[{ role:"user", parts:[{ text: ctx+"\n\nSo'rov: "+userText }] }],
+    generationConfig:{ responseMimeType:"application/json", temperature:0.2 }
+  };
+  const typing=document.createElement("div"); typing.className="msg b"; typing.textContent="…"; log.appendChild(typing); log.scrollTop=log.scrollHeight;
+  try{
+    const res = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    typing.remove();
+    if(!res.ok){ const t=await res.text(); chat("b",`⚠ Gemini xato (${res.status}). Model/kalitни tekshiring.\n`+t.slice(0,300)); return; }
+    const data = await res.json();
+    const txt = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
+    let obj; try{ obj = JSON.parse(txt); }catch{ chat("b","Javobни o'qib bo'lмади:\n"+txt.slice(0,300)); return; }
+    const n = Array.isArray(obj.rules)? addRules(obj.rules, true) : 0;
+    chat("b", obj.reply || (n? "Qo'shdim." : "Qoida topilmadi."), n);
+    if(n) switchTab("rulesTab");
+  }catch(e){ typing.remove(); chat("b","⚠ Tarmoq xatosi: "+e.message); }
+}
+
+document.getElementById("send").onclick = fireSend;
+document.getElementById("inp").addEventListener("keydown",e=>{ if(e.key==="Enter") fireSend(); });
+function fireSend(){ const inp=document.getElementById("inp"); const t=inp.value.trim(); if(!t) return; inp.value=""; chat("u",t); askGemini(t); }
+
+render();
+</script>
+</body>
+</html>
