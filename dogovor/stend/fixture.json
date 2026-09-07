@@ -1,11 +1,14 @@
 {
-  "_": "СТЕНД — общая тестовая кухня. НЕ простая коробка: Г-форма + угловой модуль + гола. Каждая кассета обязана дать на нём правильный JSON (test/golden).",
-  "name": "L-kuhnya-gola",
+  "_": "СТЕНД — тестовый корпус. ЗАПОЛНЕНО реальными панелями из Mebelchi 2 (golden-фикстуры, транскрипт заводского SWJ008 — по TODO основателя «заполнить реальными данными из Mebelchi 2»). Каждая кассета обязана дать на них правильный JSON (test/golden). factory_mm = точные Length×Width×Thickness из XML.",
+  "name": "mebelchi2-real-corpus",
   "profileId": "std-16mm",
+  "source": "Mebelchi 2 golden fixtures — «XML output examples/*.XML» = tests/golden/xml/*",
   "panels": [
-    { "id": "bok-A",   "role": "side",  "envelope_mm": { "width_mm": 560, "height_mm": 720, "depth_mm": 16 } },
-    { "id": "fasad-B", "role": "front", "envelope_mm": { "width_mm": 396, "height_mm": 716, "depth_mm": 16 }, "gola_top_mm": 58 },
-    { "id": "ugol-C",  "role": "corner","envelope_mm": { "width_mm": 900, "height_mm": 720, "depth_mm": 16 }, "note": "угловой — ловит абсолютные координаты" }
+    { "id": "YON BAK-1_4_1", "role": "side",    "factory_mm": { "length_mm": 634,  "width_mm": 520, "thickness_mm": 16 }, "source": "YON BAK-1_4_1.XML" },
+    { "id": "POL_3_1",       "role": "bottom",  "factory_mm": { "length_mm": 988,  "width_mm": 503, "thickness_mm": 16 }, "source": "POL_3_1.XML" },
+    { "id": "KRISHKA_1_1",   "role": "top",     "factory_mm": { "length_mm": 1100, "width_mm": 600, "thickness_mm": 16 }, "source": "KRISHKA_1_1.XML" },
+    { "id": "POLKA-1_7_1",   "role": "shelf",   "factory_mm": { "length_mm": 503,  "width_mm": 486, "thickness_mm": 16 }, "source": "POLKA-1_7_1.XML" },
+    { "id": "ORTA BAK_6_1",  "role": "divider", "factory_mm": { "length_mm": 538,  "width_mm": 503, "thickness_mm": 16 }, "source": "ORTA BAK_6_1.XML", "note": "средняя СТОЙКА — двусторонняя сверловка Face A + Face B (реальные данные дивайдера — кандидат для §3 stage 2b)" }
   ],
-  "TODO": "заполнить реальными данными из Mebelchi 2 при переезде dvizhok"
+  "ne_hvataet": "Г-форма + угловой модуль + гола: golden-панелей на них у нас НЕТ — ждут заводских данных от основателя."
 }
