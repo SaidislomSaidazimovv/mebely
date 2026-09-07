@@ -25,20 +25,16 @@
   input,textarea,select{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
   input:focus,textarea:focus{outline:none;border-color:var(--acc)}
   main{flex:1;display:flex;min-height:0}
-  /* stage */
-  #stage{flex:1;position:relative;overflow:hidden;background:
-    radial-gradient(circle at 30% 20%,#1a1f28,#0f1115 70%)}
+  #stage{flex:1;position:relative;overflow:hidden;background:radial-gradient(circle at 30% 20%,#1a1f28,#0f1115 70%)}
   #svgwrap{position:absolute;inset:0}
   svg{width:100%;height:100%;display:block}
   #hint{position:absolute;left:14px;bottom:12px;color:var(--mut);font-size:12px;pointer-events:none}
-  /* side */
   aside{width:390px;min-width:340px;max-width:46vw;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line)}
   .tabs{display:flex;border-bottom:1px solid var(--line)}
   .tabs button{border:0;border-radius:0;flex:1;background:transparent;color:var(--mut);padding:10px;border-bottom:2px solid transparent}
   .tabs button.on{color:#fff;border-bottom-color:var(--acc)}
   .tabpane{flex:1;min-height:0;display:none;flex-direction:column}
   .tabpane.on{display:flex}
-  /* chat */
   #log{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
   .msg{padding:8px 11px;border-radius:10px;max-width:92%;white-space:pre-wrap;word-break:break-word}
   .msg.u{align-self:flex-end;background:var(--acc2);color:#fff;border-bottom-right-radius:3px}
@@ -47,7 +43,6 @@
   .msg .added{color:var(--acc);font-size:12px;margin-top:4px}
   .composer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
   .composer input{flex:1}
-  /* rules */
   #rules{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
   .rule{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
   .rule .t{font-weight:650;color:var(--acc);text-transform:uppercase;font-size:11px;letter-spacing:.4px}
@@ -59,12 +54,6 @@
   .rowbtns{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-top:1px solid var(--line)}
   .rowbtns button{font-size:12.5px;padding:5px 9px}
   .empty{color:var(--mut);text-align:center;padding:26px 10px;font-size:13px}
-  /* settings */
-  #settings{padding:14px;display:flex;flex-direction:column;gap:12px;overflow:auto}
-  #settings label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
-  .field{}
-  .note{font-size:11.5px;color:var(--mut)}
-  code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12px}
   .ok{color:var(--acc)} .bad{color:var(--bad)}
 </style>
 </head>
@@ -85,7 +74,6 @@
     <div class="tabs">
       <button data-tab="chat" class="on">Chatbot</button>
       <button data-tab="rulesTab">Qoidalar</button>
-      <button data-tab="setTab">Sozlama</button>
     </div>
 
     <div class="tabpane on" id="chat">
@@ -106,26 +94,6 @@
         <button class="ghost" id="dlBtn">⇩ JSON</button>
       </div>
     </div>
-
-    <div class="tabpane" id="setTab">
-      <div id="settings">
-        <div class="field">
-          <label>Gemini API kaliti (sizniki — faqat brauzeringizда saqlanadi)</label>
-          <input id="key" type="password" placeholder="AIza…" />
-        </div>
-        <div class="field">
-          <label>Model</label>
-          <input id="model" placeholder="gemini-2.0-flash" />
-          <div class="note">Masalan: <code>gemini-2.0-flash</code>, <code>gemini-2.5-flash</code>, <code>gemini-1.5-flash</code>. Sizда mavjud modelни yozing.</div>
-        </div>
-        <button class="acc" id="saveKey">Saqlash</button>
-        <div class="note" id="keyStat"></div>
-        <div class="note" style="margin-top:10px">
-          Kalit <b>faylда emas</b> — brauzeringizning <code>localStorage</code>'ида. Google Gemini API brauzerдан to'g'ridan-to'g'ri chaqiriladi, proxy shart emas.
-          Bu shaxsiy/demo asbob uchun. Kalitni <b>hech kimга ulamang</b>.
-        </div>
-      </div>
-    </div>
   </aside>
 </main>
 
@@ -133,17 +101,20 @@
 "use strict";
 /* ─────────────────────────────────────────────────────────────────────────
    Mebely 2D — qoidalar bilan boshqariladigan fasad (algoritm 0dan).
-   Yagona haqiqat manbai = RULES (qoidalar). Chatbot (Gemini) NL → qoida → RULES.
-   2D fasad RULES'дан render qilinadi. Domen o'lchovlari — Mebelchi konvensiyasidan
-   (16mm плита, System-32 polka, bazaviy shkaf ~600×720) qayta ishlatilган.
+   Yagona haqiqat manbai = RULES. Chatbot (Gemini) NL → qoida → RULES → 2D fasad.
+   Domen o'lchovlari — Mebelchi konvensiyasidan (16mm плита, ~600×720 baza, System-32).
+
+   ⬇⬇⬇  API KALITI  ⬇⬇⬇
+   Kalit shu yerда — foydalanuvchi HECH NIMA kiritмайди, tayyor ishlaydi.
+   DIQQAT: bu SIR. Bu faylni ochiq GitHub'ga PUSH QILMANG (kalit oshkor bo'ladi).
    ───────────────────────────────────────────────────────────────────────── */
+const GEMINI_KEY   = "PASTE_YOUR_GEMINI_API_KEY_HERE";   // ← shu qatorга kalitni qo'ying
+const GEMINI_MODEL = "gemini-3.6-flash";                 // API talab qilган model
 
-const LS = { rules:"mebely2d_rules", key:"mebely2d_gkey", model:"mebely2d_gmodel" };
-const MM = 16;                       // плита qalinligi (mm) — domen konvensiyasi
-const DEF = { width_mm:600, height_mm:720, depth_mm:560 }; // bazaviy shkaf
-const DOOR_STYLES = ["gladkiy","frezerovka","ramka","styoklo","bez"]; // domendан soddalashtirilган
+const LS = { rules:"mebely2d_rules" };
+const MM = 16;
+const DEF = { width_mm:600, height_mm:720, depth_mm:560 };
 
-/* ── STATE ── */
 let rules = load(LS.rules, []);
 let uid = Math.max(0, ...rules.map(r=>+String(r.id).replace(/\D/g,"")||0));
 const nid = () => "r"+(++uid);
@@ -151,9 +122,7 @@ const nid = () => "r"+(++uid);
 function load(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
 function save(){ try{ localStorage.setItem(LS.rules, JSON.stringify(rules)) }catch{} }
 
-/* ── ALGORITM (0dan): RULES → SCENE ──
-   Har bir «cabinet» qoidasi (count bilan) shkaflar yaratadi. Keyin divider/shelves/door
-   qoidalari shkaflarга qo'llanadi (target: индекс yoki "all"/"last"). Natija — SCENE. */
+/* ── ALGORITM (0dan): RULES → SCENE ── */
 function buildScene(){
   const cabs = [];
   const push = r => cabs.push({
@@ -168,10 +137,8 @@ function buildScene(){
     const i = num(t,-1); return (i>=0 && i<cabs.length)? [i] : [];
   };
   for(const r of rules){
-    if(r.type==="divider"){ // "between":[a,b] yoki cabinet index; sonи = count
+    if(r.type==="divider"){
       if(Array.isArray(r.between) && r.between.length>=2){
-        // ikki shkaf ORASIDA stoyka = ularни tutashtirган alohida vertikal panel — soddalashtirilган:
-        // o'ng shkafning chap tomonига stoyka belgisi (yoki alohida ingichka shkaf).
         const b = Math.min(...r.between.map(x=>num(x,0)));
         if(b>=0 && b<cabs.length) cabs[b].dividers = Math.max(cabs[b].dividers, num(r.count,1));
       } else for(const i of targets(r.cabinet)) cabs[i].dividers += num(r.count,1);
@@ -185,50 +152,43 @@ const num = (v,d)=> Number.isFinite(+v)? +v : d;
 
 /* ── RENDER: SCENE → SVG fasad ── */
 const svg = document.getElementById("svg");
-let view = { fit:true };
 function render(){
   const cabs = buildScene();
   document.getElementById("stat").textContent = "qoidalar: "+rules.length;
   renderRules();
   if(!cabs.length){ svg.innerHTML = `<text x="500" y="350" fill="#5a6474" font-size="20" text-anchor="middle">Bo'sh — qoida qo'shing</text>`; return; }
 
-  const GAP = 40;               // shkaflar orasi (mm, ko'rinish uchun)
+  const GAP = 40;
   const totalW = cabs.reduce((s,c)=>s+c.w,0) + GAP*(cabs.length-1);
   const maxH = Math.max(...cabs.map(c=>c.h));
   const pad = 120;
-  const vw = totalW + pad*2, vh = maxH + pad*2 + 90; // +90 = pastда o'lchov yozuvi
+  const vw = totalW + pad*2, vh = maxH + pad*2 + 90;
   svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
 
-  const floorY = pad + maxH;    // pol chizig'i (fasad pasti)
+  const floorY = pad + maxH;
   let x = pad;
   const parts = [];
-  // pol
   parts.push(`<line x1="${pad-30}" y1="${floorY}" x2="${vw-pad+30}" y2="${floorY}" stroke="#3a424f" stroke-width="3"/>`);
 
-  cabs.forEach((c,idx)=>{
+  cabs.forEach((c)=>{
     const y = floorY - c.h;
-    // korpus
     parts.push(rect(x,y,c.w,c.h, "var(--carcass)","var(--carcassEdge)",3));
-    // ички bo'shliq (плита qalinligi)
     const ix=x+MM, iy=y+MM, iw=c.w-2*MM, ih=c.h-2*MM;
     parts.push(rect(ix,iy,iw,ih,"#1b2029","#3a3125",1));
-    // stoykalar (vertikal) → отсеклар
     const comp = c.dividers+1;
     const cellW = (iw - c.dividers*MM)/comp;
     const cellX = [];
     let cx=ix;
     for(let k=0;k<comp;k++){ cellX.push([cx,cellW]); cx+=cellW; if(k<comp-1){ parts.push(rect(cx,iy,MM,ih,"var(--divider)","#5c4a2c",1)); cx+=MM; } }
-    // polkalar (har отсекда, teng) + eshik
     for(const [px,pw] of cellX){
       if(c.shelves>0){
         for(let s=1;s<=c.shelves;s++){ const sy = iy + ih*s/(c.shelves+1); parts.push(`<line x1="${px}" y1="${sy}" x2="${px+pw}" y2="${sy}" stroke="var(--shelf)" stroke-width="${MM}" stroke-opacity=".85"/>`); }
       }
       if(c.door && c.door!=="bez"){
         parts.push(rect(px+4,iy+4,pw-8,ih-8,"rgba(233,220,195,.14)","var(--door)",1.5));
-        parts.push(`<circle cx="${px+pw-16}" cy="${iy+ih/2}" r="4" fill="var(--door)"/>`); // ruchka
+        parts.push(`<circle cx="${px+pw-16}" cy="${iy+ih/2}" r="4" fill="var(--door)"/>`);
       }
     }
-    // o'lchov
     parts.push(`<text x="${x+c.w/2}" y="${floorY+34}" fill="#93a0b4" font-size="20" text-anchor="middle">${c.w}×${c.h}</text>`);
     parts.push(`<text x="${x+c.w/2}" y="${floorY+58}" fill="#5a6474" font-size="15" text-anchor="middle">${labelOf(c)}</text>`);
     x += c.w + GAP;
@@ -259,7 +219,6 @@ function desc(r){
 }
 const esc = s=> String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* ── qoida qo'shish (chatbot yoki qo'lда) ── */
 function addRules(list, flash){
   const ids=[];
   for(const r of list){ if(!r||!r.type) continue; r.id = nid(); rules.push(r); ids.push(r.id); }
@@ -268,7 +227,6 @@ function addRules(list, flash){
   return ids.length;
 }
 
-/* ── manual tugmalar ── */
 document.querySelectorAll("[data-add]").forEach(b=> b.onclick = ()=>{
   const t=b.dataset.add;
   if(t==="cabinet") addRules([{type:"cabinet",count:1,...DEF}],true);
@@ -278,7 +236,6 @@ document.querySelectorAll("[data-add]").forEach(b=> b.onclick = ()=>{
   switchTab("rulesTab");
 });
 
-/* ── tabs, fit, clear, download ── */
 function switchTab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
   document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id===id)); }
 document.querySelectorAll(".tabs button").forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
@@ -289,39 +246,30 @@ document.getElementById("dlBtn").onclick = ()=>{
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="mebely-rules.json"; a.click();
 };
 
-/* ── Gemini chatbot ── */
-const gkey = ()=> load(LS.key,"");
-const gmodel = ()=> load(LS.model,"") || "gemini-2.0-flash";
-document.getElementById("key").value = gkey();
-document.getElementById("model").value = gmodel();
-document.getElementById("saveKey").onclick = ()=>{
-  localStorage.setItem(LS.key, JSON.stringify(document.getElementById("key").value.trim()));
-  localStorage.setItem(LS.model, JSON.stringify(document.getElementById("model").value.trim()));
-  const s=document.getElementById("keyStat"); s.innerHTML = gkey()? `<span class="ok">✔ saqlandi</span>` : `<span class="bad">kalit bo'sh</span>`;
-};
-document.getElementById("keyStat").innerHTML = gkey()? `<span class="ok">✔ kalit bор</span>` : "kalit kiritilmagan";
-
+/* ── Gemini chatbot (kalit fayl ustidа baked) ── */
 const log = document.getElementById("log");
 function chat(role,text,addedN){
   const d=document.createElement("div"); d.className="msg "+(role==="u"?"u":role==="sys"?"sys":"b"); d.textContent=text;
   if(addedN){ const a=document.createElement("div"); a.className="added"; a.textContent=`＋ ${addedN} ta qoida qo'shildi → Qoidalar`; d.appendChild(a); }
   log.appendChild(d); log.scrollTop=log.scrollHeight;
 }
-chat("sys","Salom! Tabiiy tilда yozing — «2 shkaf, orasida stoyka», «hammasига 3 polka», «birinchi shkafga gladkiy eshik». Qoidани tushunib, Qoidalar fayliga qo'shaman, fasad yangilanadi.");
+const KEY_OK = GEMINI_KEY && GEMINI_KEY !== "PASTE_YOUR_GEMINI_API_KEY_HERE";
+chat("sys","Salom! Tabiiy tilда yozing — «2 shkaf, orasida stoyka», «hammasига 3 polka», «birinchi shkafга gladkiy eshik». Qoidани tushunib, Qoidalar fayliga qo'shaman, fasad yangilanadi.");
+if(!KEY_OK) chat("sys","⚠ API kaliti fayl ичida qo'yilmagan (GEMINI_KEY qatori). Chatbotсиз ham «Qoidalar» tab tugmalari bilan sinash mumkin.");
 
 const SYS = `Sen mebel dizayn yordamchисisan. Foydalanuvchining tabiiy til (o'zbek/rus) so'rovини QOIDA obyektlarига aylantirasan.
-Faqat JSON qaytar: {"reply": "<qisqa javob>", "rules": [ <qoida obyektlari> ]}.
+Faqat JSON qaytar: {"reply":"<qisqa javob>","rules":[ <qoida obyektlari> ]}.
 Qoida turlari:
-- {"type":"cabinet","count":<son>,"width_mm":<mm>,"height_mm":<mm>,"depth_mm":<mm>}  // shkaf(lar) qo'shish. Default 600×720×560.
-- {"type":"divider","cabinet":<индекс|"all"|"last">,"count":<son>}  yoki  {"type":"divider","between":[<i>,<j>],"count":<son>}  // stoyka
-- {"type":"shelves","cabinet":<индекс|"all"|"last">,"count":<son>}  // polkalar
-- {"type":"door","cabinet":<индекс|"all"|"last">,"style":"gladkiy|frezerovka|ramka|styoklo|bez"}  // eshik
-Shkaflar 0dan indekslanadi. "rules" — MAVJUD qoidalarга QO'SHILADIGAN yangилар. Agar so'rov noaniq bo'lsa, "rules":[] va "reply"да savol ber.`;
+- {"type":"cabinet","count":<son>,"width_mm":<mm>,"height_mm":<mm>,"depth_mm":<mm>}  // default 600×720×560
+- {"type":"divider","cabinet":<индекс|"all"|"last">,"count":<son>}  yoki  {"type":"divider","between":[<i>,<j>],"count":<son>}
+- {"type":"shelves","cabinet":<индекс|"all"|"last">,"count":<son>}
+- {"type":"door","cabinet":<индекс|"all"|"last">,"style":"gladkiy|frezerovka|ramka|styoklo|bez"}
+Shkaflar 0dan indekslanadi. "rules" — MAVJUD qoidalarга QO'SHILADIGAN yangилар. Noaniq bo'lsa "rules":[] va "reply"да savol ber.`;
 
 async function askGemini(userText){
-  const key=gkey(); if(!key){ chat("b","⚠ Avval «Sozlama»да Gemini kalitини kiriting."); switchTab("setTab"); return; }
+  if(!KEY_OK){ chat("b","⚠ API kaliti fayl ичida yo'q — GEMINI_KEY qatorига kalitni qo'ying."); return; }
   const ctx = `Hozirgi qoidalar (kontekst): ${JSON.stringify(rules)}`;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(gmodel())}:generateContent?key=${encodeURIComponent(key)}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
   const body = {
     system_instruction:{ parts:[{ text: SYS }] },
     contents:[{ role:"user", parts:[{ text: ctx+"\n\nSo'rov: "+userText }] }],
@@ -331,10 +279,10 @@ async function askGemini(userText){
   try{
     const res = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     typing.remove();
-    if(!res.ok){ const t=await res.text(); chat("b",`⚠ Gemini xato (${res.status}). Model/kalitни tekshiring.\n`+t.slice(0,300)); return; }
+    if(!res.ok){ const t=await res.text(); chat("b",`⚠ Gemini xato (${res.status}).\n`+t.slice(0,400)); return; }
     const data = await res.json();
     const txt = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
-    let obj; try{ obj = JSON.parse(txt); }catch{ chat("b","Javobни o'qib bo'lмади:\n"+txt.slice(0,300)); return; }
+    let obj; try{ obj = JSON.parse(txt); }catch{ chat("b","Javobни o'qib bo'lмади:\n"+txt.slice(0,400)); return; }
     const n = Array.isArray(obj.rules)? addRules(obj.rules, true) : 0;
     chat("b", obj.reply || (n? "Qo'shdim." : "Qoida topilmadi."), n);
     if(n) switchTab("rulesTab");
