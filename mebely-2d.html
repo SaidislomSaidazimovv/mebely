@@ -150,8 +150,16 @@ function buildScene(){
 }
 const num = (v,d)=> Number.isFinite(+v)? +v : d;
 
-/* ── RENDER: SCENE → SVG fasad ── */
+/* ── RENDER: SCENE → SVG fasad (+ 32mm grid, zoom/pan) ── */
 const svg = document.getElementById("svg");
+let vb=null, userAdjusted=false, fitW=1000; const GRID=32;   // GRID=32mm — System-32 mashtab to'ri
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function applyVB(){ if(!vb) return; svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  document.getElementById("stat").textContent = `qoidalar: ${rules.length} · mashtab ${Math.round(fitW/vb.w*100)}%`; }
+function grid32(vw,vh){ let g='<g stroke="#222a35" stroke-width="1" stroke-opacity=".55">';
+  for(let gx=0;gx<=vw;gx+=GRID) g+=`<line x1="${gx}" y1="0" x2="${gx}" y2="${vh}"/>`;
+  for(let gy=0;gy<=vh;gy+=GRID) g+=`<line x1="0" y1="${gy}" x2="${vw}" y2="${gy}"/>`;
+  return g+'</g>'; }
 function render(){
   const cabs = buildScene();
   document.getElementById("stat").textContent = "qoidalar: "+rules.length;
@@ -163,11 +171,12 @@ function render(){
   const maxH = Math.max(...cabs.map(c=>c.h));
   const pad = 120;
   const vw = totalW + pad*2, vh = maxH + pad*2 + 90;
-  svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+  fitW = vw; if(!vb || !userAdjusted) vb = {x:0,y:0,w:vw,h:vh}; applyVB();
 
   const floorY = pad + maxH;
   let x = pad;
   const parts = [];
+  parts.push(grid32(vw,vh));
   parts.push(`<line x1="${pad-30}" y1="${floorY}" x2="${vw-pad+30}" y2="${floorY}" stroke="#3a424f" stroke-width="3"/>`);
 
   cabs.forEach((c)=>{
@@ -239,7 +248,20 @@ document.querySelectorAll("[data-add]").forEach(b=> b.onclick = ()=>{
 function switchTab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
   document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id===id)); }
 document.querySelectorAll(".tabs button").forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
-document.getElementById("fitBtn").onclick = ()=>render();
+document.getElementById("fitBtn").onclick = ()=>{ userAdjusted=false; render(); };
+/* ZOOM (sichqoncha g'ildiragi) + PAN (surish) — bemalol yaqin/uzoq ko'rish */
+svg.addEventListener("wheel", e=>{ e.preventDefault(); if(!vb) return;
+  const r=svg.getBoundingClientRect();
+  const cx=vb.x+(e.clientX-r.left)/r.width*vb.w, cy=vb.y+(e.clientY-r.top)/r.height*vb.h;
+  const f=e.deltaY>0?1.12:1/1.12, nw=clamp(vb.w*f,80,300000), nh=vb.h*(nw/vb.w);
+  vb.x=cx-(cx-vb.x)*(nw/vb.w); vb.y=cy-(cy-vb.y)*(nh/vb.h); vb.w=nw; vb.h=nh;
+  userAdjusted=true; applyVB(); }, {passive:false});
+let _drag=null;
+svg.addEventListener("pointerdown", e=>{ if(!vb)return; _drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y}; svg.style.cursor="grabbing"; try{svg.setPointerCapture(e.pointerId)}catch{} });
+svg.addEventListener("pointermove", e=>{ if(!_drag||!vb)return; const r=svg.getBoundingClientRect();
+  vb.x=_drag.vx-(e.clientX-_drag.x)/r.width*vb.w; vb.y=_drag.vy-(e.clientY-_drag.y)/r.height*vb.h; userAdjusted=true; applyVB(); });
+const _endDrag=()=>{ _drag=null; svg.style.cursor=""; };
+svg.addEventListener("pointerup", _endDrag); svg.addEventListener("pointerleave", _endDrag);
 document.getElementById("clearBtn").onclick = ()=>{ if(confirm("Hamma qoidани o'chirishmi?")){ rules=[]; save(); render(); } };
 document.getElementById("dlBtn").onclick = ()=>{
   const blob=new Blob([JSON.stringify({version:1,rules},null,2)],{type:"application/json"});
