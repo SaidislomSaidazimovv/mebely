@@ -9,7 +9,8 @@
     "proverka": "node dogovor/proverka.mjs",
     "kontrol": "node dogovor/kontrol.mjs",
     "pult": "node pult/scan.mjs",
-    "inventar": "node pult/proverka-inventar.mjs"
+    "inventar": "node pult/proverka-inventar.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@capacitor/core": "^7.0.0",
@@ -30,6 +31,7 @@
     "@types/three": "^0.171.0",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.5.4",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
   }
 }
