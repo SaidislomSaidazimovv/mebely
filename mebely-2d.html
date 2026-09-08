@@ -299,7 +299,14 @@ async function askGemini(userText){
   };
   const typing=document.createElement("div"); typing.className="msg b"; typing.textContent="…"; log.appendChild(typing); log.scrollTop=log.scrollHeight;
   try{
-    const res = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    let res, _tries=4;
+    for(let _i=0; _i<_tries; _i++){
+      res = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(res.ok || ![429,500,502,503,504].includes(res.status) || _i===_tries-1) break;
+      typing.textContent = "… model band ("+res.status+"), qayta urinaman ("+(_i+1)+"/"+_tries+")…";
+      log.scrollTop=log.scrollHeight;
+      await new Promise(r=>setTimeout(r, 1000*Math.pow(2,_i)));  // 1s, 2s, 4s backoff
+    }
     typing.remove();
     if(!res.ok){ const t=await res.text(); chat("b",`⚠ Gemini xato (${res.status}).\n`+t.slice(0,400)); return; }
     const data = await res.json();
