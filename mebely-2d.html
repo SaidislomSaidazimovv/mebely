@@ -183,7 +183,7 @@ function makeCab(c){
     fill,
     count: Math.max(0, int(c.count, defCount(fill))),
     dividers: Math.max(0, int(c.dividers ?? c.stoyka, 0)),
-    front: c.front!=null ? normFront(c.front) : "flat",
+    front: c.front!=null ? normFront(c.front) : "none",   // default OCHIQ — polka ko'rinsin, eshik o'zidan qo'shilmasin
   };
 }
 function applyProps(cab, c){
