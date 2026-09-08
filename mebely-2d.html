@@ -21,6 +21,7 @@
   button:hover{border-color:var(--acc);color:#fff}
   button.acc{background:var(--acc);border-color:var(--acc);color:#062}
   button.ghost{background:transparent}
+  button.ghost.on{border-color:var(--acc);color:#fff;background:rgba(0,172,122,.15)}
   input,textarea,select{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
   input:focus,textarea:focus{outline:none;border-color:var(--acc)}
   main{flex:1;display:flex;min-height:0}
@@ -62,6 +63,7 @@
   <h1>Mebely · 2D</h1>
   <span class="badge" id="stat">shkaflar: 0</span>
   <span class="sp"></span>
+  <button class="ghost" id="xrayBtn" title="Rentgen — eshik ichini ko'rish">🩻 Rentgen</button>
   <button class="ghost" id="fitBtn" title="Ko'rinishga moslash">⤢ Fit</button>
   <button class="ghost" id="clearBtn" title="Hammasini tozalash">🗑 Tozalash</button>
 </header>
@@ -232,7 +234,7 @@ function buildElevation(){
 
 /* ── RENDER: elevation → to'la rangli SVG + 32mm to'r + zoom/pan ── */
 const svg = document.getElementById("svg");
-let vb=null, userAdjusted=false, fitW=1000;
+let vb=null, userAdjusted=false, fitW=1000, xray=false;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const f=n=>Math.round(n*100)/100;
 
@@ -301,9 +303,10 @@ function drawCab(P,p){
 
   const hasDoor = c.fill!=="open" && c.fill!=="drawers" && c.front!=="none";
   for(const [px,pw] of cells){
-    if(c.fill==="drawers") drawDrawers(P,px,pw,iy0,iy1,c.count,c.kind);
-    else if(!hasDoor) drawShelves(P,px,pw,iy0,iy1,c.count);      // ochiq/eshiksiz → polkalar ko'rinadi
-    else drawDoor(P,px,pw,iy0,iy1,c.front,c.kind);
+    if(c.fill==="drawers"){ drawDrawers(P,px,pw,iy0,iy1,c.count,c.kind, xray); }
+    else if(!hasDoor){ drawShelves(P,px,pw,iy0,iy1,c.count); }      // ochiq/eshiksiz → polkalar ko'rinadi
+    else if(xray){ drawShelves(P,px,pw,iy0,iy1,c.count); drawDoor(P,px,pw,iy0,iy1,c.front,c.kind, true); }  // rentgen: ichi + shaffof eshik
+    else { drawDoor(P,px,pw,iy0,iy1,c.front,c.kind, false); }
   }
 
   // столешница (base ustida, ozgina chiqib turadi)
@@ -322,13 +325,16 @@ function drawShelves(P,px,pw,iy0,iy1,count){
   for(let s=1;s<=count;s++){ const sy=iy0+(iy1-iy0)*s/(count+1);
     P.push(mmBox(inx, sy-CARCASS_T/2, sy+CARCASS_T/2, inw, PAL.shelf, PAL.shelfEdge, 1)); }
 }
-function drawDrawers(P,px,pw,iy0,iy1,count,kind){
+function drawDrawers(P,px,pw,iy0,iy1,count,kind,ghost){
+  if(ghost) P.push('<g opacity="0.4">');
   const n=Math.max(1,count), gp=4;
   for(let k=0;k<n;k++){ const dy0=iy0+(iy1-iy0)*k/n, dy1=iy0+(iy1-iy0)*(k+1)/n;
     P.push(mmBox(px+gp, dy0+gp, dy1-gp, pw-2*gp, "url(#fac)", PAL.facadeEdge, 1.3));
     const hy=(dy0+dy1)/2; P.push(mmBox(px+pw/2-90, hy-8, hy+8, 180, PAL.handle, PAL.handleEdge, 1)); }
+  if(ghost) P.push('</g>');
 }
-function drawDoor(P,px,pw,iy0,iy1,front,kind){
+function drawDoor(P,px,pw,iy0,iy1,front,kind,ghost){
+  if(ghost) P.push('<g opacity="0.34">');
   const gp=4, x0=px+gp, w=pw-2*gp;
   P.push(mmBox(x0, iy0+gp, iy1-gp, w, "url(#fac)", PAL.facadeEdge, 1.5));
   const m=Math.min(70, w*0.16, (iy1-iy0)*0.14);
@@ -338,6 +344,7 @@ function drawDoor(P,px,pw,iy0,iy1,front,kind){
   // dastak: base/penal → yuqorida, upper → pastda
   const hy=(kind==="upper")? iy0+gp+50 : iy1-gp-50;
   P.push(mmBox(px+pw/2-100, hy-7, hy+7, 200, PAL.handle, PAL.handleEdge, 1));
+  if(ghost) P.push('</g>');
 }
 function drawDims(P, placed, wallW){
   const bases=placed.filter(p=>p.c.kind!=="upper"); if(!bases.length) return;
@@ -386,6 +393,7 @@ function switchTab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.c
   document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id===id)); }
 document.querySelectorAll(".tabs button").forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
 document.getElementById("fitBtn").onclick=()=>{ userAdjusted=false; render(); };
+document.getElementById("xrayBtn").onclick=(e)=>{ xray=!xray; e.currentTarget.classList.toggle("on",xray); render(); };
 document.getElementById("clearBtn").onclick=()=>{ if(confirm("Hamma shkafni o'chirishmi?")){ cabs=[]; save(); render(); } };
 document.getElementById("dlBtn").onclick=()=>{
   const blob=new Blob([JSON.stringify({version:2,cabs},null,2)],{type:"application/json"});
@@ -414,7 +422,7 @@ function chat(role,text,addedN){
   log.appendChild(d); log.scrollTop=log.scrollHeight;
 }
 const KEY_OK = GEMINI_KEY && GEMINI_KEY !== "PASTE_YOUR_GEMINI_API_KEY_HERE";
-chat("sys","Salom! Tabiiy tilda yozing — «3 ta baza shkaf, har birida 2 polka», «1-shkafga shisha eshik», «oxirgi shkafga 1 stoyka», «2-shkafni o'chir». Shkaflar chapdan o'ngga 1,2,3… raqamlangan (chizmada ko'rinadi).");
+chat("sys","Salom! Tabiiy tilda yozing — «3 ta baza shkaf, har birida 2 polka», «1-shkafga shisha eshik», «oxirgi shkafga 1 stoyka», «2-shkafni o'chir». Shkaflar 1,2,3… raqamlangan. Eshik ichidagi polkani ko'rish uchun tepadagi «🩻 Rentgen» tugmasini bosing.");
 if(!KEY_OK) chat("sys","⚠ API kaliti fayl ichida qo'yilmagan. Chatbotsiz ham «Qoidalar» tab tugmalari bilan ishlash mumkin.");
 
 const SYS = `Sen mebel dizayn yordamchisisan. Foydalanuvchining tabiiy til (o'zbek/rus) so'rovini BUYRUQLARGA aylantirasan.
