@@ -8,7 +8,6 @@
   :root{
     --bg:#0f1115; --panel:#161a21; --panel2:#1d222b; --line:#2a313d; --ink:#e7ecf3;
     --mut:#93a0b4; --acc:#00ac7a; --acc2:#3b82f6; --warn:#e0a83b; --bad:#e5484d;
-    --carcass:#c9b18a; --carcassEdge:#8a744f; --door:#e9dcc3; --shelf:#a98f66; --divider:#8a744f;
   }
   *{box-sizing:border-box}
   body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
@@ -25,10 +24,12 @@
   input,textarea,select{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
   input:focus,textarea:focus{outline:none;border-color:var(--acc)}
   main{flex:1;display:flex;min-height:0}
-  #stage{flex:1;position:relative;overflow:hidden;background:radial-gradient(circle at 30% 20%,#1a1f28,#0f1115 70%)}
+  #stage{flex:1;position:relative;overflow:hidden;background:#0b0d11}
   #svgwrap{position:absolute;inset:0}
-  svg{width:100%;height:100%;display:block}
-  #hint{position:absolute;left:14px;bottom:12px;color:var(--mut);font-size:12px;pointer-events:none}
+  svg{width:100%;height:100%;display:block;cursor:grab}
+  /* to'la 2D: barcha chiziqlar zoomdan qat'i nazar bir xil ingichka */
+  #svg rect,#svg line,#svg circle,#svg polygon{vector-effect:non-scaling-stroke}
+  #hint{position:absolute;left:14px;bottom:12px;color:var(--mut);font-size:12px;pointer-events:none;max-width:60%}
   aside{width:390px;min-width:340px;max-width:46vw;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line)}
   .tabs{display:flex;border-bottom:1px solid var(--line)}
   .tabs button{border:0;border-radius:0;flex:1;background:transparent;color:var(--mut);padding:10px;border-bottom:2px solid transparent}
@@ -45,7 +46,7 @@
   .composer input{flex:1}
   #rules{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
   .rule{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
-  .rule .t{font-weight:650;color:var(--acc);text-transform:uppercase;font-size:11px;letter-spacing:.4px}
+  .rule .t{font-weight:700;color:var(--acc);font-size:12px;min-width:26px}
   .rule .body{flex:1;font-size:12.5px;color:var(--ink)}
   .rule .x{cursor:pointer;color:var(--mut);border:0;background:transparent;padding:0 4px}
   .rule .x:hover{color:var(--bad)}
@@ -54,13 +55,12 @@
   .rowbtns{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-top:1px solid var(--line)}
   .rowbtns button{font-size:12.5px;padding:5px 9px}
   .empty{color:var(--mut);text-align:center;padding:26px 10px;font-size:13px}
-  .ok{color:var(--acc)} .bad{color:var(--bad)}
 </style>
 </head>
 <body>
 <header>
   <h1>Mebely · 2D</h1>
-  <span class="badge" id="stat">qoidalar: 0</span>
+  <span class="badge" id="stat">shkaflar: 0</span>
   <span class="sp"></span>
   <button class="ghost" id="fitBtn" title="Ko'rinishga moslash">⤢ Fit</button>
   <button class="ghost" id="clearBtn" title="Hammasini tozalash">🗑 Tozalash</button>
@@ -68,7 +68,7 @@
 <main>
   <section id="stage">
     <div id="svgwrap"><svg id="svg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg></div>
-    <div id="hint">Old ko'rinish (fasad). O'ngда chatbotga yozing — masalan: «2 ta shkaf qo'y, orasida bitta stoyka».</div>
+    <div id="hint">To'liq 2D old ko'rinish (fasad). O'ngda chatbotga yozing — masalan: «3 ta baza shkaf, har birida 2 polka», «1-shkafga shisha eshik», «2-shkafni o'chir».</div>
   </section>
   <aside>
     <div class="tabs">
@@ -87,10 +87,12 @@
     <div class="tabpane" id="rulesTab">
       <div id="rules"></div>
       <div class="rowbtns">
-        <button data-add="cabinet">+ Shkaf</button>
+        <button data-add="base">+ Baza</button>
+        <button data-add="upper">+ Yuqori</button>
+        <button data-add="tall">+ Penal</button>
+        <button data-add="shelf">+ Polka</button>
         <button data-add="divider">+ Stoyka</button>
-        <button data-add="shelves">+ Polka</button>
-        <button data-add="door">+ Eshik</button>
+        <button data-add="door">Eshik ⟳</button>
         <button class="ghost" id="dlBtn">⇩ JSON</button>
       </div>
     </div>
@@ -100,197 +102,335 @@
 <script>
 "use strict";
 /* ─────────────────────────────────────────────────────────────────────────
-   Mebely 2D — qoidalar bilan boshqariladigan fasad (algoritm 0dan).
-   Yagona haqiqat manbai = RULES. Chatbot (Gemini) NL → qoida → RULES → 2D fasad.
-   Domen o'lchovlari — Mebelchi konvensiyasidan (16mm плита, ~600×720 baza, System-32).
+   Mebely 2D — qoidalar bilan boshqariladigan TO'LIQ (rangli) 2D fasad (algoritm 0dan).
+   Yagona haqiqat manbai = SHKAFLAR ro'yxati (qoidalar fayli). Chatbot (Gemini)
+   NL → commands (add/set/remove/clear) → ro'yxat yangilanadi → 2D fasad qayta chiziladi.
 
-   ⬇⬇⬇  API KALITI  ⬇⬇⬇
-   Kalit shu yerда — foydalanuvchi HECH NIMA kiritмайди, tayyor ishlaydi.
+   O'lchov/geometriya + material ranglari HAQIQIY app'dan (prilozhenie/korpus/model):
+     GEOM: цоколь 120mm, baza 720, столешница 40mm, upper pasti 1520, upper 720,
+           penal 2100; doska 16mm; enlar 800/600/500/450/400/300; base chuq. 560.
+     Palitra (KitchenStyle default): carcass #efe8da, facade #e7ddc9, worktop #7c756b, handle #6f6a62.
+
+   ⬇⬇⬇  API KALITI  ⬇⬇⬇  — foydalanuvchi HECH NIMA kiritmaydi, tayyor ishlaydi.
    DIQQAT: bu SIR. Bu faylni ochiq GitHub'ga PUSH QILMANG (kalit oshkor bo'ladi).
    ───────────────────────────────────────────────────────────────────────── */
-const GEMINI_KEY   = "PASTE_YOUR_GEMINI_API_KEY_HERE";   // ← shu qatorга kalitni qo'ying
-const GEMINI_MODEL = "gemini-3.6-flash";                 // API talab qilган model
+const GEMINI_KEY   = "PASTE_YOUR_GEMINI_API_KEY_HERE";   // ← kalitni shu qatorga qo'ying (lokal; GitHub'ga chiqmasin)
+const GEMINI_MODEL = "gemini-3.6-flash";                 // API talab qilgan model
 
-const LS = { rules:"mebely2d_rules" };
-const MM = 16;
-const DEF = { width_mm:600, height_mm:720, depth_mm:560 };
+/* ── HAQIQIY app konvensiyalari (mm) ── */
+const CARCASS_T = 16;                        // doska qalinligi
+const GRID = 32;                             // System-32 to'r
+const GEOM = { plinth:120, baseH:720, worktop:40, upperH:720, upperBottom:1520, tallH:2100 };
+const WIDTHS = [800,600,500,450,400,300];    // standart enlar (WIDE_LADDER)
+const DEF_W = 600;
+const FRONTS = ["flat","shaker","glass","fluted","none"];  // gladkiy/frezer/shisha/rifleniy/eshiksiz
+const KINDS  = ["base","upper","tall"];
+const LS = "mebely2d_cabs_v2";
+/* material palitrasi (haqiqiy app KitchenStyle default) */
+const PAL = {
+  wall:"#e8e4dc", floor:"#d0c9bb", floorEdge:"#b3aa98", grid:"#d6d0c3",
+  carcass:"#efe8da", carcassEdge:"#c7ba9d", back:"#e3dcc9",
+  facade:"#e7ddc9", facadeEdge:"#c4b491",
+  worktopEdge:"#565046",
+  plinth:"#403c36", plinthEdge:"#2b2824",
+  handle:"#9a948a", handleEdge:"#6c675e",
+  glass:"#cfe0e4", shelf:"#ddd0b2", shelfEdge:"#b3a47d",
+};
+const DEFS = `<defs>
+  <linearGradient id="fac" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2ecdd"/><stop offset="1" stop-color="#e0d5bd"/></linearGradient>
+  <linearGradient id="wtop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b8479"/><stop offset="1" stop-color="#6a645a"/></linearGradient>
+  <linearGradient id="glz" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcebef"/><stop offset="1" stop-color="#bcd2d8"/></linearGradient>
+</defs>`;
 
-let rules = load(LS.rules, []);
-let uid = Math.max(0, ...rules.map(r=>+String(r.id).replace(/\D/g,"")||0));
-const nid = () => "r"+(++uid);
-
-function load(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
-function save(){ try{ localStorage.setItem(LS.rules, JSON.stringify(rules)) }catch{} }
-
-/* ── ALGORITM (0dan): RULES → SCENE ── */
-function buildScene(){
-  const cabs = [];
-  const push = r => cabs.push({
-    w: num(r.width_mm, DEF.width_mm), h: num(r.height_mm, DEF.height_mm),
-    d: num(r.depth_mm, DEF.depth_mm), dividers:0, shelves:0, door:null, ruleId:r.id
-  });
-  for(const r of rules) if(r.type==="cabinet"){ const n=Math.max(1,num(r.count,1)); for(let i=0;i<n;i++) push(r); }
-
-  const targets = (t) => {
-    if(t==null || t==="all") return cabs.map((_,i)=>i);
-    if(t==="last") return cabs.length? [cabs.length-1] : [];
-    const i = num(t,-1); return (i>=0 && i<cabs.length)? [i] : [];
-  };
-  for(const r of rules){
-    if(r.type==="divider"){
-      if(Array.isArray(r.between) && r.between.length>=2){
-        const b = Math.min(...r.between.map(x=>num(x,0)));
-        if(b>=0 && b<cabs.length) cabs[b].dividers = Math.max(cabs[b].dividers, num(r.count,1));
-      } else for(const i of targets(r.cabinet)) cabs[i].dividers += num(r.count,1);
-    }
-    else if(r.type==="shelves") for(const i of targets(r.cabinet)) cabs[i].shelves = num(r.count,3);
-    else if(r.type==="door") for(const i of targets(r.cabinet)) cabs[i].door = String(r.style||"gladkiy");
-  }
-  return cabs;
-}
-const num = (v,d)=> Number.isFinite(+v)? +v : d;
-
-/* ── RENDER: SCENE → SVG fasad (+ 32mm grid, zoom/pan) ── */
-const svg = document.getElementById("svg");
-let vb=null, userAdjusted=false, fitW=1000; const GRID=32;   // GRID=32mm — System-32 mashtab to'ri
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function applyVB(){ if(!vb) return; svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
-  document.getElementById("stat").textContent = `qoidalar: ${rules.length} · mashtab ${Math.round(fitW/vb.w*100)}%`; }
-function grid32(vw,vh){ let g='<g stroke="#222a35" stroke-width="1" stroke-opacity=".55">';
-  for(let gx=0;gx<=vw;gx+=GRID) g+=`<line x1="${gx}" y1="0" x2="${gx}" y2="${vh}"/>`;
-  for(let gy=0;gy<=vh;gy+=GRID) g+=`<line x1="0" y1="${gy}" x2="${vw}" y2="${gy}"/>`;
-  return g+'</g>'; }
-function render(){
-  const cabs = buildScene();
-  document.getElementById("stat").textContent = "qoidalar: "+rules.length;
-  renderRules();
-  if(!cabs.length){ svg.innerHTML = `<text x="500" y="350" fill="#5a6474" font-size="20" text-anchor="middle">Bo'sh — qoida qo'shing</text>`; return; }
-
-  const GAP = 40;
-  const totalW = cabs.reduce((s,c)=>s+c.w,0) + GAP*(cabs.length-1);
-  const maxH = Math.max(...cabs.map(c=>c.h));
-  const pad = 120;
-  const vw = totalW + pad*2, vh = maxH + pad*2 + 90;
-  fitW = vw; if(!vb || !userAdjusted) vb = {x:0,y:0,w:vw,h:vh}; applyVB();
-
-  const floorY = pad + maxH;
-  let x = pad;
-  const parts = [];
-  parts.push(grid32(vw,vh));
-  parts.push(`<line x1="${pad-30}" y1="${floorY}" x2="${vw-pad+30}" y2="${floorY}" stroke="#3a424f" stroke-width="3"/>`);
-
-  cabs.forEach((c)=>{
-    const y = floorY - c.h;
-    parts.push(rect(x,y,c.w,c.h, "var(--carcass)","var(--carcassEdge)",3));
-    const ix=x+MM, iy=y+MM, iw=c.w-2*MM, ih=c.h-2*MM;
-    parts.push(rect(ix,iy,iw,ih,"#1b2029","#3a3125",1));
-    const comp = c.dividers+1;
-    const cellW = (iw - c.dividers*MM)/comp;
-    const cellX = [];
-    let cx=ix;
-    for(let k=0;k<comp;k++){ cellX.push([cx,cellW]); cx+=cellW; if(k<comp-1){ parts.push(rect(cx,iy,MM,ih,"var(--divider)","#5c4a2c",1)); cx+=MM; } }
-    for(const [px,pw] of cellX){
-      if(c.shelves>0){
-        for(let s=1;s<=c.shelves;s++){ const sy = iy + ih*s/(c.shelves+1); parts.push(`<line x1="${px}" y1="${sy}" x2="${px+pw}" y2="${sy}" stroke="var(--shelf)" stroke-width="${MM}" stroke-opacity=".85"/>`); }
-      }
-      if(c.door && c.door!=="bez"){
-        parts.push(rect(px+4,iy+4,pw-8,ih-8,"rgba(233,220,195,.14)","var(--door)",1.5));
-        parts.push(`<circle cx="${px+pw-16}" cy="${iy+ih/2}" r="4" fill="var(--door)"/>`);
-      }
-    }
-    parts.push(`<text x="${x+c.w/2}" y="${floorY+34}" fill="#93a0b4" font-size="20" text-anchor="middle">${c.w}×${c.h}</text>`);
-    parts.push(`<text x="${x+c.w/2}" y="${floorY+58}" fill="#5a6474" font-size="15" text-anchor="middle">${labelOf(c)}</text>`);
-    x += c.w + GAP;
-  });
-  svg.innerHTML = parts.join("");
-}
-function rect(x,y,w,h,fill,stroke,sw){ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>` }
-function labelOf(c){ const a=[]; if(c.dividers)a.push(c.dividers+" stoyka"); if(c.shelves)a.push(c.shelves+" polka"); if(c.door&&c.door!=="bez")a.push(c.door); return a.join(" · ")||"bo'sh"; }
-
-/* ── RULES panel ── */
-function renderRules(){
-  const box = document.getElementById("rules");
-  if(!rules.length){ box.innerHTML = `<div class="empty">Qoida yo'q.<br>Chatbotga yozing yoki pastдаги tugmalar.</div>`; return; }
-  box.innerHTML = rules.map(r=>`
-    <div class="rule" data-id="${r.id}">
-      <span class="t">${esc(r.type)}</span>
-      <span class="body">${esc(desc(r))}</span>
-      <button class="x" title="o'chirish">✕</button>
-    </div>`).join("");
-  box.querySelectorAll(".x").forEach(b=> b.onclick = e=>{ const id=e.target.closest(".rule").dataset.id; rules=rules.filter(r=>String(r.id)!==id); save(); render(); });
-}
-function desc(r){
-  if(r.type==="cabinet") return `${r.count||1} dona · ${r.width_mm||DEF.width_mm}×${r.height_mm||DEF.height_mm}×${r.depth_mm||DEF.depth_mm} mm`;
-  if(r.type==="divider") return r.between? `${r.between[0]}–${r.between[1]} shkaflar orasida ${r.count||1} stoyka` : `shkaf «${r.cabinet??"all"}» → ${r.count||1} stoyka`;
-  if(r.type==="shelves") return `shkaf «${r.cabinet??"all"}» → ${r.count||3} polka`;
-  if(r.type==="door") return `shkaf «${r.cabinet??"all"}» → eshik: ${r.style||"gladkiy"}`;
-  return JSON.stringify(r);
-}
+/* ── STATE: shkaflar ro'yxati = qoidalar fayli ── */
+let cabs = load();
+let uidN = cabs.reduce((m,c)=>Math.max(m, +String(c.id).replace(/\D/g,"")||0), 0);
+const nid = ()=> "c"+(++uidN);
+const int = (v,d=0)=>{ const n=parseInt(v,10); return Number.isFinite(n)? n : d; };
 const esc = s=> String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function addRules(list, flash){
-  const ids=[];
-  for(const r of list){ if(!r||!r.type) continue; r.id = nid(); rules.push(r); ids.push(r.id); }
-  save(); render();
-  if(flash) ids.forEach(id=>{ const el=document.querySelector(`.rule[data-id="${id}"]`); if(el){ el.classList.add("flash"); } });
-  return ids.length;
+function load(){ try{ const a=JSON.parse(localStorage.getItem(LS)); return Array.isArray(a)? a : []; }catch{ return []; } }
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(cabs)); }catch{} }
+
+/* ── shkaf yaratish / xossalarni qo'llash (default'lar haqiqiy modeldan) ── */
+const defH = k => k==="tall"? GEOM.tallH : GEOM.baseH;        // upper ham 720
+const defCount = fill => fill==="drawers"? 3 : 2;
+function normFront(f){ f=String(f||"").toLowerCase();
+  if(["gladkiy","гладкий","flat","tekis"].includes(f)) return "flat";
+  if(["frezerovka","frezer","ramka","shaker","фрезер","рамка"].includes(f)) return "shaker";
+  if(["styoklo","steklo","shisha","glass","стекло"].includes(f)) return "glass";
+  if(["fluted","rifleniy","рифл","fluta"].includes(f)) return "fluted";
+  if(["bez","yoq","none","eshiksiz","без"].includes(f)) return "none";
+  return FRONTS.includes(f)? f : "flat"; }
+function normFill(f){ f=String(f||"").toLowerCase();
+  if(["drawers","yashik","yashiklar","ящик","ящики"].includes(f)) return "drawers";
+  if(["open","ochiq","открыт","otkrit"].includes(f)) return "open";
+  return "shelves"; }
+function normKind(k){ k=String(k||"").toLowerCase();
+  if(["upper","yuqori","navesnoy","верхн","tepa"].includes(k)) return "upper";
+  if(["tall","penal","shkaf-kolonna","пенал","kolonka","baland"].includes(k)) return "tall";
+  return "base"; }
+
+function makeCab(c){
+  const kind = normKind(c.kind);
+  const fill = c.fill!=null ? normFill(c.fill) : "shelves";
+  return {
+    id: nid(), kind,
+    w: Math.max(150, int(c.w, DEF_W)),
+    h: Math.max(150, int(c.h, defH(kind))),
+    fill,
+    count: Math.max(0, int(c.count, defCount(fill))),
+    dividers: Math.max(0, int(c.dividers ?? c.stoyka, 0)),
+    front: c.front!=null ? normFront(c.front) : "flat",
+  };
+}
+function applyProps(cab, c){
+  if(c.kind!=null){ cab.kind=normKind(c.kind); if(c.h==null) cab.h=defH(cab.kind); }
+  if(c.w!=null) cab.w=Math.max(150,int(c.w,cab.w));
+  if(c.h!=null) cab.h=Math.max(150,int(c.h,cab.h));
+  if(c.fill!=null) cab.fill=normFill(c.fill);
+  if(c.count!=null) cab.count=Math.max(0,int(c.count,cab.count));
+  if(c.dividers!=null || c.stoyka!=null) cab.dividers=Math.max(0,int(c.dividers ?? c.stoyka, cab.dividers));
+  if(c.front!=null) cab.front=normFront(c.front);
+}
+function targets(n){
+  if(n==null || n==="all" || n==="hammasi") return cabs.slice();
+  if(n==="last" || n==="oxirgi" || n==="oxirghi") return cabs.length? [cabs[cabs.length-1]] : [];
+  const k=int(n,0); return (k>=1 && k<=cabs.length)? [cabs[k-1]] : [];   // 1-based!
 }
 
-document.querySelectorAll("[data-add]").forEach(b=> b.onclick = ()=>{
+/* ── COMMANDS qo'llash (Gemini yoki tugmalar) ── */
+function applyCommands(cmds){
+  const flash=[]; let del=0;
+  for(const c of (Array.isArray(cmds)? cmds : [])){
+    const op=String(c.op||"").toLowerCase();
+    if(op==="clear"){ del+=cabs.length; cabs=[]; }
+    else if(op==="add"){ const t=Math.max(1,int(c.times ?? c.n_cabinets ?? 1)); for(let i=0;i<t;i++){ const cab=makeCab(c); cabs.push(cab); flash.push(cab.id); } }
+    else if(op==="set"){ for(const cab of targets(c.n ?? c.cabinet)){ applyProps(cab,c); flash.push(cab.id); } }
+    else if(op==="remove"||op==="delete"){ const ids=new Set(targets(c.n ?? c.cabinet).map(x=>x.id)); const b=cabs.length; cabs=cabs.filter(x=>!ids.has(x.id)); del+=b-cabs.length; }
+  }
+  save(); render();
+  flash.forEach(id=>{ const el=document.querySelector(`.rule[data-id="${id}"]`); if(el) el.classList.add("flash"); });
+  return { added:flash.length, removed:del };
+}
+
+/* ───────────── ALGORITM 0dan: SHKAFLAR → ELEVATION (mm, pol=0, y yuqoriga) ───────────── */
+function buildElevation(){
+  let bx=0, ux=0;                 // base/tall qatori va upper qatori uchun alohida x-kursor
+  const placed=[];
+  cabs.forEach((c,i)=>{
+    let x, y0, y1;
+    if(c.kind==="upper"){ x=ux; y0=GEOM.upperBottom; y1=GEOM.upperBottom+c.h; ux+=c.w; }
+    else { x=bx; y0=GEOM.plinth; y1=GEOM.plinth+c.h; bx+=c.w; }   // base + tall
+    placed.push({ c, i, num:i+1, x, y0, y1, worktop: c.kind==="base" });
+  });
+  const wallW = Math.max(bx, ux, 1);
+  const maxTop = placed.reduce((m,p)=> Math.max(m, p.worktop? p.y1+GEOM.worktop : p.y1), 0);
+  const wallH = Math.max(2400, maxTop+80);
+  return { placed, wallW, wallH };
+}
+
+/* ── RENDER: elevation → to'la rangli SVG + 32mm to'r + zoom/pan ── */
+const svg = document.getElementById("svg");
+let vb=null, userAdjusted=false, fitW=1000;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const f=n=>Math.round(n*100)/100;
+
+// koordinata: mm → ekran. flipY (pol pastda). PAD — atrofdagi joy.
+const PADL=200, PADR=140, PADT=130, PADB=250;
+let ORG={x:PADL,y:PADT,H:2400};
+const X = mx => ORG.x + mx;
+const Y = my => ORG.y + (ORG.H - my);
+
+const box=(x,y,w,h,fill,stroke,sw)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(Math.max(0,w))}" height="${f(Math.max(0,h))}" fill="${fill}" stroke="${stroke||'none'}" stroke-width="${sw||0}"/>`;
+const seg=(x1,y1,x2,y2,stroke,sw)=>`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${stroke}" stroke-width="${sw||1}"/>`;
+const T=(s,x,y,sz,anc,fill,weight)=>`<text x="${f(x)}" y="${f(y)}" font-size="${sz||18}" text-anchor="${anc||'middle'}" fill="${fill||'#3a352d'}" font-weight="${weight||400}" font-family="ui-monospace,Consolas,monospace">${esc(s)}</text>`;
+// mm to'rtburchak (mm y0..y1) → ekran
+const mmBox=(x,y0,y1,w,fill,stroke,sw)=>box(X(x),Y(y1),w,y1-y0,fill,stroke,sw);
+const mmSeg=(x1,my1,x2,my2,stroke,sw)=>seg(X(x1),Y(my1),X(x2),Y(my2),stroke,sw);
+
+function applyVB(){ if(!vb) return; svg.setAttribute("viewBox",`${f(vb.x)} ${f(vb.y)} ${f(vb.w)} ${f(vb.h)}`);
+  document.getElementById("stat").textContent = `shkaflar: ${cabs.length} · mashtab ${Math.round(fitW/vb.w*100)}%`; }
+
+function render(){
+  renderRules();
+  document.getElementById("stat").textContent = "shkaflar: "+cabs.length;
+  if(!cabs.length){ svg.innerHTML =
+    box(0,0,1000,700,PAL.wall,"none",0)+ T("Bo'sh — chatbotga yozing yoki «+ Baza»",500,350,22,"middle","#6b6656");
+    vb=vb||{x:0,y:0,w:1000,h:700}; return; }
+
+  const { placed, wallW, wallH } = buildElevation();
+  ORG = { x:PADL, y:PADT, H:wallH };
+  const VBW = wallW + PADL + PADR;
+  const VBH = wallH + PADT + PADB;
+  fitW = VBW; if(!vb || !userAdjusted) vb={x:0,y:0,w:VBW,h:VBH}; applyVB();
+
+  const P=[DEFS];
+  // devor foni + pol
+  P.push(box(0,0,VBW,VBH,PAL.wall,"none",0));
+  const floorTop=Y(0);
+  P.push(box(0,floorTop,VBW,VBH-floorTop,PAL.floor,"none",0));
+  P.push(seg(0,floorTop,VBW,floorTop,PAL.floorEdge,2));
+
+  // 32mm to'r (devor sohasida, faqat pol ustida — mayin)
+  let g=`<g stroke="${PAL.grid}" stroke-width="1" opacity="0.4">`;
+  for(let gx=0; gx<=wallW; gx+=GRID) g+=`<line x1="${f(X(gx))}" y1="${f(Y(wallH))}" x2="${f(X(gx))}" y2="${f(Y(0))}"/>`;
+  for(let gy=0; gy<=wallH; gy+=GRID) g+=`<line x1="${f(X(0))}" y1="${f(Y(gy))}" x2="${f(X(wallW))}" y2="${f(Y(gy))}"/>`;
+  P.push(g+'</g>');
+
+  placed.forEach(p=> drawCab(P,p));
+  drawDims(P, placed, wallW);
+  svg.innerHTML = P.join("");
+}
+
+function drawCab(P,p){
+  const c=p.c, {x,y0,y1}=p, w=c.w;
+  // цоколь (base/tall ostida)
+  if(c.kind!=="upper") P.push(mmBox(x+4, 0, GEOM.plinth, w-8, PAL.plinth, PAL.plinthEdge, 1.2));
+  // korpus (to'ldirilgan)
+  P.push(mmBox(x, y0, y1, w, PAL.carcass, PAL.carcassEdge, 1.6));
+  // ichki bo'shliq
+  const ix=x+CARCASS_T, iw=w-2*CARCASS_T, iy0=y0+CARCASS_T, iy1=y1-CARCASS_T;
+  P.push(mmBox(ix, iy0, iy1, iw, PAL.back, "none", 0));
+
+  // stoykalar → n+1 katak
+  const nd=Math.max(0,c.dividers|0), comp=nd+1;
+  const cellW=(iw - nd*CARCASS_T)/comp;
+  const cells=[]; let cx=ix;
+  for(let k=0;k<comp;k++){ cells.push([cx,cellW]); cx+=cellW; if(k<comp-1){ P.push(mmBox(cx,iy0,iy1,CARCASS_T,PAL.carcass,PAL.carcassEdge,1.2)); cx+=CARCASS_T; } }
+
+  const hasDoor = c.fill!=="open" && c.fill!=="drawers" && c.front!=="none";
+  for(const [px,pw] of cells){
+    if(c.fill==="drawers") drawDrawers(P,px,pw,iy0,iy1,c.count,c.kind);
+    else if(!hasDoor) drawShelves(P,px,pw,iy0,iy1,c.count);      // ochiq/eshiksiz → polkalar ko'rinadi
+    else drawDoor(P,px,pw,iy0,iy1,c.front,c.kind);
+  }
+
+  // столешница (base ustida, ozgina chiqib turadi)
+  if(p.worktop) P.push(mmBox(x-10, y1, y1+GEOM.worktop, w+20, "url(#wtop)", PAL.worktopEdge, 1.2));
+
+  // raqam belgisi (chatbot shu raqamga qaraydi)
+  const bx=X(x+30), by=Y(y1)+30;
+  P.push(`<circle cx="${f(bx)}" cy="${f(by)}" r="20" fill="#00795a" stroke="#fff" stroke-width="2"/>`);
+  P.push(T(String(p.num), bx, by+7, 21, "middle", "#fff", 700));
+  // yorliq (pol ostida)
+  P.push(T(labelOf(c), X(x+w/2), Y(0)+40, 17, "middle", "#4a463c"));
+  P.push(T(c.w+"×"+c.h, X(x+w/2), Y(0)+62, 15, "middle", "#7a7361"));
+}
+function drawShelves(P,px,pw,iy0,iy1,count){
+  const inx=px+2, inw=pw-4;
+  for(let s=1;s<=count;s++){ const sy=iy0+(iy1-iy0)*s/(count+1);
+    P.push(mmBox(inx, sy-CARCASS_T/2, sy+CARCASS_T/2, inw, PAL.shelf, PAL.shelfEdge, 1)); }
+}
+function drawDrawers(P,px,pw,iy0,iy1,count,kind){
+  const n=Math.max(1,count), gp=4;
+  for(let k=0;k<n;k++){ const dy0=iy0+(iy1-iy0)*k/n, dy1=iy0+(iy1-iy0)*(k+1)/n;
+    P.push(mmBox(px+gp, dy0+gp, dy1-gp, pw-2*gp, "url(#fac)", PAL.facadeEdge, 1.3));
+    const hy=(dy0+dy1)/2; P.push(mmBox(px+pw/2-90, hy-8, hy+8, 180, PAL.handle, PAL.handleEdge, 1)); }
+}
+function drawDoor(P,px,pw,iy0,iy1,front,kind){
+  const gp=4, x0=px+gp, w=pw-2*gp;
+  P.push(mmBox(x0, iy0+gp, iy1-gp, w, "url(#fac)", PAL.facadeEdge, 1.5));
+  const m=Math.min(70, w*0.16, (iy1-iy0)*0.14);
+  if(front==="shaker"){ P.push(mmBox(x0+m, iy0+gp+m, iy1-gp-m, w-2*m, "none", PAL.facadeEdge, 1.2)); }
+  else if(front==="glass"){ P.push(mmBox(x0+m, iy0+gp+m, iy1-gp-m, w-2*m, "url(#glz)", PAL.facadeEdge, 1.2)); }
+  else if(front==="fluted"){ for(let fx=x0+30; fx<x0+w-15; fx+=34) P.push(mmSeg(fx, iy0+gp+12, fx, iy1-gp-12, PAL.facadeEdge, 1)); }
+  // dastak: base/penal → yuqorida, upper → pastda
+  const hy=(kind==="upper")? iy0+gp+50 : iy1-gp-50;
+  P.push(mmBox(px+pw/2-100, hy-7, hy+7, 200, PAL.handle, PAL.handleEdge, 1));
+}
+function drawDims(P, placed, wallW){
+  const bases=placed.filter(p=>p.c.kind!=="upper"); if(!bases.length) return;
+  const yy=Y(0)+96;                                   // umumiy en (pol ostida)
+  P.push(seg(X(0),yy,X(wallW),yy,"#9a9385",1));
+  P.push(seg(X(0),yy-7,X(0),yy+7,"#9a9385",1));
+  P.push(seg(X(wallW),yy-7,X(wallW),yy+7,"#9a9385",1));
+  P.push(T(wallW+" mm", X(wallW/2), yy-6, 15, "middle", "#6b6555"));
+}
+
+function labelOf(c){
+  const kL={base:"Baza",upper:"Yuqori",tall:"Penal"}[c.kind]||c.kind;
+  const fL={shelves:c.count+" polka",drawers:c.count+" yashik",open:"ochiq"}[c.fill];
+  const a=[kL, fL];
+  if(c.dividers) a.push(c.dividers+" stoyka");
+  const hasDoor=c.fill!=="open"&&c.fill!=="drawers"&&c.front!=="none";
+  if(hasDoor) a.push({flat:"gladkiy",shaker:"frezer",glass:"shisha",fluted:"rifleniy"}[c.front]||c.front);
+  return a.join(" · ");
+}
+
+/* ── QOIDALAR paneli (raqamlangan shkaflar) ── */
+function renderRules(){
+  const el=document.getElementById("rules");
+  if(!cabs.length){ el.innerHTML=`<div class="empty">Shkaf yo'q.<br>Chatbotga yozing yoki pastdagi tugmalar.</div>`; return; }
+  el.innerHTML = cabs.map((c,i)=>`
+    <div class="rule" data-id="${c.id}">
+      <span class="t">№${i+1}</span>
+      <span class="body">${esc(labelOf(c))} · ${c.w}×${c.h} mm</span>
+      <button class="x" title="o'chirish">✕</button>
+    </div>`).join("");
+  el.querySelectorAll(".x").forEach(b=> b.onclick=e=>{ const id=e.target.closest(".rule").dataset.id;
+    cabs=cabs.filter(c=>String(c.id)!==id); save(); render(); });
+}
+
+/* ── qo'lda tugmalar ── */
+const last=()=>cabs[cabs.length-1];
+document.querySelectorAll("[data-add]").forEach(b=> b.onclick=()=>{
   const t=b.dataset.add;
-  if(t==="cabinet") addRules([{type:"cabinet",count:1,...DEF}],true);
-  else if(t==="divider") addRules([{type:"divider",cabinet:"last",count:1}],true);
-  else if(t==="shelves") addRules([{type:"shelves",cabinet:"all",count:3}],true);
-  else if(t==="door") addRules([{type:"door",cabinet:"all",style:"gladkiy"}],true);
+  if(t==="base"||t==="upper"||t==="tall") applyCommands([{op:"add",kind:t}]);
+  else if(t==="shelf"){ const c=last(); if(c){ c.count=(c.count|0)+1; if(c.fill==="drawers") c.fill="shelves"; save(); render(); } }
+  else if(t==="divider"){ const c=last(); if(c){ c.dividers=(c.dividers|0)+1; save(); render(); } }
+  else if(t==="door"){ const c=last(); if(c){ const i=FRONTS.indexOf(c.front); c.front=FRONTS[(i+1)%FRONTS.length]; if(c.fill==="open") c.fill="shelves"; save(); render(); } }
   switchTab("rulesTab");
 });
-
 function switchTab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
   document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("on",p.id===id)); }
 document.querySelectorAll(".tabs button").forEach(b=> b.onclick=()=>switchTab(b.dataset.tab));
-document.getElementById("fitBtn").onclick = ()=>{ userAdjusted=false; render(); };
-/* ZOOM (sichqoncha g'ildiragi) + PAN (surish) — bemalol yaqin/uzoq ko'rish */
+document.getElementById("fitBtn").onclick=()=>{ userAdjusted=false; render(); };
+document.getElementById("clearBtn").onclick=()=>{ if(confirm("Hamma shkafni o'chirishmi?")){ cabs=[]; save(); render(); } };
+document.getElementById("dlBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify({version:2,cabs},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="mebely-cabs.json"; a.click();
+};
+
+/* ── ZOOM (g'ildirak) + PAN (surish) — bemalol yaqin/uzoq ── */
 svg.addEventListener("wheel", e=>{ e.preventDefault(); if(!vb) return;
   const r=svg.getBoundingClientRect();
   const cx=vb.x+(e.clientX-r.left)/r.width*vb.w, cy=vb.y+(e.clientY-r.top)/r.height*vb.h;
-  const f=e.deltaY>0?1.12:1/1.12, nw=clamp(vb.w*f,80,300000), nh=vb.h*(nw/vb.w);
+  const fr=e.deltaY>0?1.12:1/1.12, nw=clamp(vb.w*fr,120,400000), nh=vb.h*(nw/vb.w);
   vb.x=cx-(cx-vb.x)*(nw/vb.w); vb.y=cy-(cy-vb.y)*(nh/vb.h); vb.w=nw; vb.h=nh;
   userAdjusted=true; applyVB(); }, {passive:false});
 let _drag=null;
 svg.addEventListener("pointerdown", e=>{ if(!vb)return; _drag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y}; svg.style.cursor="grabbing"; try{svg.setPointerCapture(e.pointerId)}catch{} });
 svg.addEventListener("pointermove", e=>{ if(!_drag||!vb)return; const r=svg.getBoundingClientRect();
   vb.x=_drag.vx-(e.clientX-_drag.x)/r.width*vb.w; vb.y=_drag.vy-(e.clientY-_drag.y)/r.height*vb.h; userAdjusted=true; applyVB(); });
-const _endDrag=()=>{ _drag=null; svg.style.cursor=""; };
-svg.addEventListener("pointerup", _endDrag); svg.addEventListener("pointerleave", _endDrag);
-document.getElementById("clearBtn").onclick = ()=>{ if(confirm("Hamma qoidани o'chirishmi?")){ rules=[]; save(); render(); } };
-document.getElementById("dlBtn").onclick = ()=>{
-  const blob=new Blob([JSON.stringify({version:1,rules},null,2)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="mebely-rules.json"; a.click();
-};
+const _end=()=>{ _drag=null; svg.style.cursor="grab"; };
+svg.addEventListener("pointerup",_end); svg.addEventListener("pointerleave",_end);
 
-/* ── Gemini chatbot (kalit fayl ustidа baked) ── */
-const log = document.getElementById("log");
+/* ───────────── Gemini chatbot (kalit fayl ustida baked) ───────────── */
+const log=document.getElementById("log");
 function chat(role,text,addedN){
   const d=document.createElement("div"); d.className="msg "+(role==="u"?"u":role==="sys"?"sys":"b"); d.textContent=text;
-  if(addedN){ const a=document.createElement("div"); a.className="added"; a.textContent=`＋ ${addedN} ta qoida qo'shildi → Qoidalar`; d.appendChild(a); }
+  if(addedN){ const a=document.createElement("div"); a.className="added"; a.textContent=addedN; d.appendChild(a); }
   log.appendChild(d); log.scrollTop=log.scrollHeight;
 }
 const KEY_OK = GEMINI_KEY && GEMINI_KEY !== "PASTE_YOUR_GEMINI_API_KEY_HERE";
-chat("sys","Salom! Tabiiy tilда yozing — «2 shkaf, orasida stoyka», «hammasига 3 polka», «birinchi shkafга gladkiy eshik». Qoidани tushunib, Qoidalar fayliga qo'shaman, fasad yangilanadi.");
-if(!KEY_OK) chat("sys","⚠ API kaliti fayl ичida qo'yilmagan (GEMINI_KEY qatori). Chatbotсиз ham «Qoidalar» tab tugmalari bilan sinash mumkin.");
+chat("sys","Salom! Tabiiy tilda yozing — «3 ta baza shkaf, har birida 2 polka», «1-shkafga shisha eshik», «oxirgi shkafga 1 stoyka», «2-shkafni o'chir». Shkaflar chapdan o'ngga 1,2,3… raqamlangan (chizmada ko'rinadi).");
+if(!KEY_OK) chat("sys","⚠ API kaliti fayl ichida qo'yilmagan. Chatbotsiz ham «Qoidalar» tab tugmalari bilan ishlash mumkin.");
 
-const SYS = `Sen mebel dizayn yordamchисisan. Foydalanuvchining tabiiy til (o'zbek/rus) so'rovини QOIDA obyektlarига aylantirasan.
-Faqat JSON qaytar: {"reply":"<qisqa javob>","rules":[ <qoida obyektlari> ]}.
-Qoida turlari:
-- {"type":"cabinet","count":<son>,"width_mm":<mm>,"height_mm":<mm>,"depth_mm":<mm>}  // default 600×720×560
-- {"type":"divider","cabinet":<индекс|"all"|"last">,"count":<son>}  yoki  {"type":"divider","between":[<i>,<j>],"count":<son>}
-- {"type":"shelves","cabinet":<индекс|"all"|"last">,"count":<son>}
-- {"type":"door","cabinet":<индекс|"all"|"last">,"style":"gladkiy|frezerovka|ramka|styoklo|bez"}
-Shkaflar 0dan indekslanadi. "rules" — MAVJUD qoidalarга QO'SHILADIGAN yangилар. Noaniq bo'lsa "rules":[] va "reply"да savol ber.`;
+const SYS = `Sen mebel dizayn yordamchisisan. Foydalanuvchining tabiiy til (o'zbek/rus) so'rovini BUYRUQLARGA aylantirasan.
+Faqat JSON qaytar: {"reply":"<qisqa javob>","commands":[ <buyruqlar> ]}.
+Shkaflar chapdan o'ngga 1 dan raqamlanadi (n = shkaf raqami). Buyruq turlari:
+- {"op":"add","kind":"base|upper|tall","times":<nechta shkaf, dflt 1>,"w":<mm?>,"h":<mm?>,"fill":"shelves|drawers|open","count":<polka/yashik soni?>,"dividers":<stoyka soni?>,"front":"flat|shaker|glass|fluted|none"}
+- {"op":"set","n":<raqam|"all"|"last">, ...(o'zgartiriladigan xossalar: w,h,kind,fill,count,dividers,front)}
+- {"op":"remove","n":<raqam|"all"|"last">}    // o'chirish
+- {"op":"clear"}                               // hammasini tozalash
+Lug'at: gladkiy=flat, frezerovka/ramka=shaker, styoklo/shisha=glass, rifleniy=fluted, eshiksiz/ochiq=none/open; stoyka=dividers; polka=fill:shelves+count; yashik=fill:drawers+count; penal/kolonka=tall; navesnoy/tepa=upper.
+Default o'lchov (agar aytilmasa): base/upper w=600 h=720, tall h=2100. "2 ta shkaf" => times:2. Noaniq bo'lsa "commands":[] va "reply"da savol ber.`;
 
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
 async function askGemini(userText){
-  if(!KEY_OK){ chat("b","⚠ API kaliti fayl ичida yo'q — GEMINI_KEY qatorига kalitni qo'ying."); return; }
-  const ctx = `Hozirgi qoidalar (kontekst): ${JSON.stringify(rules)}`;
+  if(!KEY_OK){ chat("b","⚠ API kaliti fayl ichida yo'q — GEMINI_KEY qatoriga kalitni qo'ying."); return; }
+  const ctx = `Hozirgi shkaflar (kontekst): ${JSON.stringify(cabs.map((c,i)=>({n:i+1,kind:c.kind,w:c.w,h:c.h,fill:c.fill,count:c.count,dividers:c.dividers,front:c.front})))}`;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
   const body = {
     system_instruction:{ parts:[{ text: SYS }] },
@@ -305,19 +445,19 @@ async function askGemini(userText){
       if(res.ok || ![429,500,502,503,504].includes(res.status) || _i===_tries-1) break;
       typing.textContent = "… model band ("+res.status+"), qayta urinaman ("+(_i+1)+"/"+_tries+")…";
       log.scrollTop=log.scrollHeight;
-      await new Promise(r=>setTimeout(r, 1000*Math.pow(2,_i)));  // 1s, 2s, 4s backoff
+      await sleep(1000*Math.pow(2,_i));  // 1s, 2s, 4s backoff
     }
     typing.remove();
     if(!res.ok){ const t=await res.text(); chat("b",`⚠ Gemini xato (${res.status}).\n`+t.slice(0,400)); return; }
     const data = await res.json();
     const txt = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("") || "";
-    let obj; try{ obj = JSON.parse(txt); }catch{ chat("b","Javobни o'qib bo'lмади:\n"+txt.slice(0,400)); return; }
-    const n = Array.isArray(obj.rules)? addRules(obj.rules, true) : 0;
-    chat("b", obj.reply || (n? "Qo'shdim." : "Qoida topilmadi."), n);
-    if(n) switchTab("rulesTab");
+    let obj; try{ obj = JSON.parse(txt); }catch{ chat("b","Javobni o'qib bo'lmadi:\n"+txt.slice(0,400)); return; }
+    const r = applyCommands(obj.commands);
+    const note = [r.added?`＋${r.added} yangilandi`:"", r.removed?`−${r.removed} o'chirildi`:""].filter(Boolean).join(" · ");
+    chat("b", obj.reply || (note? "Bajarildi." : "O'zgarish yo'q."), note||null);
+    if(r.added||r.removed) switchTab("rulesTab");
   }catch(e){ typing.remove(); chat("b","⚠ Tarmoq xatosi: "+e.message); }
 }
-
 document.getElementById("send").onclick = fireSend;
 document.getElementById("inp").addEventListener("keydown",e=>{ if(e.key==="Enter") fireSend(); });
 function fireSend(){ const inp=document.getElementById("inp"); const t=inp.value.trim(); if(!t) return; inp.value=""; chat("u",t); askGemini(t); }
